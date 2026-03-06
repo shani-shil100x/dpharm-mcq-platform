@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --color-slate-50: #f8fafc;
+  --color-slate-900: #0f172a;
+}
+
+:root {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+}
+
+.dark {
+  --bg-color: #0f172a; /* Custom dark slate for background */
+  --text-color: #f8fafc; /* Light text for dark mode */
+}
+
+/* Base tailwind resets / dark mode mappings */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom animations for green/red highlights in MCQ */
+@keyframes flashGreen {
+  0% { background-color: transparent; }
+  50% { background-color: #dcfce7; }
+  100% { background-color: transparent; }
+}
+
+.mcq-option {
+  transition: all 0.2s ease-in-out;
+}
+
+.mcq-option:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}

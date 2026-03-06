@@ -83,10 +83,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end">
-              <Link href="/forgot-password" className="text-sm font-semibold text-emerald-500 hover:text-emerald-400 transition-colors">
-                Forgot Password?
-              </Link>
+            <div className="flex items-center justify-end h-2">
+              {/* Intentionally left blank or for future use to keep spacing */}
             </div>
 
             <button

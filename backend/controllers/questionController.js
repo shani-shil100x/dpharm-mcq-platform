@@ -93,10 +93,6 @@ const bulkUploadQuestions = async (req, res, next) => {
 
     await Question.insertMany(questionsToInsert);
     
-    // Update total questions in subject
-    subject.totalQuestions += questionsToInsert.length;
-    await subject.save();
-
     res.status(201).json({
       message: `${questionsToInsert.length} questions successfully uploaded!`,
     });
@@ -137,14 +133,7 @@ const deleteQuestion = async (req, res, next) => {
     const question = await Question.findById(req.params.id);
 
     if (question) {
-      const subject = await Subject.findById(question.subjectId);
       await question.deleteOne();
-
-      if (subject) {
-        subject.totalQuestions = Math.max(0, subject.totalQuestions - 1);
-        await subject.save();
-      }
-
       res.json({ message: 'Question removed' });
     } else {
       res.status(404);

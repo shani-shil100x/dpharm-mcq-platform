@@ -1,5 +1,7 @@
 const Subject = require('../models/Subject');
 const Question = require('../models/Question');
+const UserStats = require('../models/UserStats');
+const ExamResult = require('../models/ExamResult');
 
 // @desc    Get all subjects
 // @route   GET /api/subjects
@@ -7,7 +9,18 @@ const Question = require('../models/Question');
 const getSubjects = async (req, res, next) => {
   try {
     const subjects = await Subject.find({});
-    res.json(subjects);
+    
+    // Dynamically calculate totalQuestions for each subject ensuring 100% accuracy
+    const subjectsWithCounts = await Promise.all(
+      subjects.map(async (subject) => {
+        const count = await Question.countDocuments({ subjectId: subject._id });
+        const subjectObj = subject.toObject();
+        subjectObj.totalQuestions = count;
+        return subjectObj;
+      })
+    );
+
+    res.json(subjectsWithCounts);
   } catch (error) {
     next(error);
   }
@@ -70,8 +83,11 @@ const deleteSubject = async (req, res, next) => {
     const subject = await Subject.findById(req.params.id);
 
     if (subject) {
-      // Delete all questions for this subject first
+      // Cascade delete all dependent data
       await Question.deleteMany({ subjectId: subject._id });
+      await UserStats.deleteMany({ subjectId: subject._id });
+      await ExamResult.deleteMany({ subjectId: subject._id });
+      
       await subject.deleteOne();
       res.json({ message: 'Subject removed' });
     } else {

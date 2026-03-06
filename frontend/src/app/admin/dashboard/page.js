@@ -130,7 +130,8 @@ export default function AdminDashboard() {
     if (confirm('Delete this subject and ALL its questions permanently?')) {
       try {
         await api.delete(`/subjects/${id}`);
-        fetchData();
+        setSubjects((prev) => prev.filter((s) => s._id !== id));
+        if (selectedSubjectId === id) setSelectedSubjectId('');
       } catch (error) {
         alert('Delete failed');
       }
@@ -170,7 +171,11 @@ export default function AdminDashboard() {
     if (confirm('Delete this question permanently?')) {
       try {
         await api.delete(`/questions/${id}`);
-        fetchData();
+        setMcqs((prev) => prev.filter((q) => q._id !== id));
+        // Also update local subject question count manually to reflect delete
+        setSubjects((prev) => prev.map(s => 
+          s._id === selectedSubjectId ? { ...s, totalQuestions: Math.max(0, s.totalQuestions - 1) } : s
+        ));
       } catch (error) {
         alert('Delete failed');
       }
@@ -448,7 +453,7 @@ Answer: B. Carbon Dioxide`}
                                   if (confirm(`Delete user "${u.name}" (${u.email})? This will remove all their data permanently.`)) {
                                     try {
                                       await api.delete(`/auth/users/${u._id}`);
-                                      fetchData();
+                                      setUsers((prev) => prev.filter((user) => user._id !== u._id));
                                     } catch (err) {
                                       alert(err.response?.data?.message || 'Delete failed');
                                     }

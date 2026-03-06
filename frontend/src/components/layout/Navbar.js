@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, User, LayoutDashboard, BrainCircuit, Upload, Menu, X, Home, TrendingUp } from 'lucide-react';
+import { LogOut, User, LayoutDashboard, BrainCircuit, Upload, Menu, X, Home, TrendingUp, Youtube } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout, loading } = useAuth();
@@ -51,6 +51,9 @@ const Navbar = () => {
                     <LayoutDashboard className="h-4 w-4 mr-1.5" /> Admin Panel
                   </Link>
                 )}
+                <a href="https://www.youtube.com/@user-rb8dk1xe3y" target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-300 hover:text-red-500 transition-colors font-medium text-sm">
+                  <Youtube className="h-4 w-4 mr-1.5" /> YouTube
+                </a>
                 <div className="h-6 w-px bg-slate-700"></div>
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 rounded-full bg-emerald-900/40 flex items-center justify-center">
@@ -112,6 +115,9 @@ const Navbar = () => {
                     <Upload className="h-5 w-5" /> Upload MCQs
                   </Link>
                 )}
+                <a href="https://www.youtube.com/@user-rb8dk1xe3y" target="_blank" rel="noopener noreferrer" onClick={closeMobile} className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-300 hover:bg-red-900/20 hover:text-red-500 font-medium text-sm">
+                  <Youtube className="h-5 w-5" /> YouTube Playlist
+                </a>
                 <button onClick={() => { logout(); closeMobile(); }} className="flex items-center gap-3 px-3 py-3 rounded-lg text-red-500 hover:bg-red-900/20 font-medium text-sm w-full">
                   <LogOut className="h-5 w-5" /> Logout
                 </button>

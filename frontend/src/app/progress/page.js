@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/axios';
-import { Loader2, Trophy, Clock, ArrowRight, TrendingUp, ChevronLeft, CheckCircle, XCircle, Target } from 'lucide-react';
+import { Loader2, Trophy, Clock, ArrowRight, TrendingUp, ChevronLeft, CheckCircle, XCircle, Target, Trash2 } from 'lucide-react';
 
 export default function ProgressPage() {
   const { user, loading } = useAuth();
@@ -13,6 +13,22 @@ export default function ProgressPage() {
   const [examHistory, setExamHistory] = useState([]);
   const [stats, setStats] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleResetProgress = async () => {
+    if (confirm('Are you sure you want to permanently reset all your progress and track record? This action cannot be undone.')) {
+      setIsResetting(true);
+      try {
+        await api.delete('/user/stats/reset');
+        setExamHistory([]);
+        setStats([]);
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to reset progress.');
+      } finally {
+        setIsResetting(false);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -69,9 +85,19 @@ export default function ProgressPage() {
           </h1>
           <p className="text-gray-400 mt-1 transition-colors">Track your complete learning journey across all subjects.</p>
         </div>
-        <Link href="/dashboard" className="text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors">
-          Dashboard <ArrowRight className="h-4 w-4" />
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleResetProgress}
+            disabled={isResetting || (stats.length === 0 && examHistory.length === 0)}
+            className="text-sm font-medium text-red-400 hover:text-red-300 bg-red-900/10 hover:bg-red-900/20 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isResetting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            Reset Progress
+          </button>
+          <Link href="/dashboard" className="text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center justify-center gap-1 transition-colors px-4 py-2 border border-emerald-900/30 rounded-lg hover:bg-emerald-900/10">
+            Dashboard <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
       {/* Overall Stats Summary */}

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/axios';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Loader2, Target, CheckCircle, XCircle, Trophy, Clock, ArrowRight } from 'lucide-react';
+import { Loader2, Target, CheckCircle, XCircle, Trophy, Clock, ArrowRight, Trash2 } from 'lucide-react';
 
 export default function UserDashboard() {
   const { user, loading } = useAuth();
@@ -14,6 +14,22 @@ export default function UserDashboard() {
   const [stats, setStats] = useState([]);
   const [examHistory, setExamHistory] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleResetProgress = async () => {
+    if (confirm('Are you sure you want to permanently reset all your progress and track record? This action cannot be undone.')) {
+      setIsResetting(true);
+      try {
+        await api.delete('/user/stats/reset');
+        setExamHistory([]);
+        setStats([]);
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to reset progress.');
+      } finally {
+        setIsResetting(false);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -89,9 +105,19 @@ export default function UserDashboard() {
 
   return (
     <div className="container mx-auto px-4 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white transition-colors">Welcome, {user?.name}</h1>
-        <p className="text-gray-400 mt-2 transition-colors">Here is an overview of your practice performance.</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white transition-colors">Welcome, {user?.name}</h1>
+          <p className="text-gray-400 mt-2 transition-colors">Here is an overview of your practice performance.</p>
+        </div>
+        <button
+          onClick={handleResetProgress}
+          disabled={isResetting || (stats.length === 0 && examHistory.length === 0)}
+          className="text-sm font-medium text-red-400 hover:text-red-300 bg-red-900/10 hover:bg-red-900/20 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isResetting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+          Reset Progress
+        </button>
       </div>
 
       {/* Summary Cards */}

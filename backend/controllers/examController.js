@@ -16,7 +16,11 @@ const submitExam = async (req, res, next) => {
     }
 
     // Fetch all questions for this subject to score server-side
-    const questions = await Question.find({ subjectId });
+    // OPTIMIZATION: Only request _id and correctAnswer, and use .lean() for raw JSON.
+    // This dramatically reduces memory when fetching 50+ questions at once.
+    const questions = await Question.find({ subjectId })
+      .select('_id correctAnswer')
+      .lean();
 
     if (questions.length === 0) {
       res.status(400);

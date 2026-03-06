@@ -1,11 +1,86 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 import { Loader2, ArrowLeft, ArrowRight, ChevronLeft, CheckCircle2, XCircle, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
+
+// Helper for highly robust answer checking (handles "A. Option" vs "Option" mismatches)
+const checkIsCorrect = (option, correctAnswer) => {
+  if (!option || !correctAnswer) return false;
+  const normalize = (str) => str.toString().trim().toLowerCase();
+  
+  // Exact match
+  if (normalize(option) === normalize(correctAnswer)) return true;
+  
+  // Match ignoring the "A. " or "B. " prefixes
+  const optBody = normalize(option.replace(/^[A-Z]\.\s*/i, ''));
+  const ansBody = normalize(correctAnswer.replace(/^[A-Z]\.\s*/i, ''));
+  
+  return optBody === ansBody;
+};
+
+const PracticeQuestionCard = memo(({ q, globalIndex, selectedOption, onSelect }) => {
+  const isAnswered = !!selectedOption;
+  const isCorrect = isAnswered && checkIsCorrect(selectedOption, q.correctAnswer);
+
+  const getOptionStyles = (option) => {
+    if (!selectedOption) {
+      return 'bg-slate-800 border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 text-gray-300 cursor-pointer';
+    }
+
+    const isThisOptionCorrect = checkIsCorrect(option, q.correctAnswer);
+
+    if (isThisOptionCorrect) {
+      return 'bg-emerald-900/40 border-emerald-600 text-emerald-300 scale-[1.02] shadow-sm z-10';
+    }
+
+    if (selectedOption === option && !isThisOptionCorrect) {
+      return 'bg-red-900/40 border-red-600 text-red-300';
+    }
+
+    return 'bg-slate-800 border-slate-700 text-gray-600 opacity-60 cursor-not-allowed';
+  };
+
+  return (
+    <div id={`q-${globalIndex}`} className="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
+      <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex justify-between items-start">
+        <h3 className="text-lg font-bold text-white font-serif leading-relaxed">
+          <span className="text-emerald-400 mr-2">Q{globalIndex}.</span>
+          {q.questionText}
+        </h3>
+        {isAnswered && (
+          <div className="ml-4 shrink-0">
+            {isCorrect ? (
+              <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+            ) : (
+              <XCircle className="h-6 w-6 text-red-500" />
+            )}
+          </div>
+        )}
+      </div>
+      <div className="p-6">
+        <div className="space-y-3">
+          {q.options.map((option, idx) => (
+            <button
+              key={idx}
+              onClick={() => onSelect(q._id, option, q.correctAnswer)}
+              disabled={isAnswered}
+              className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-300 mcq-option font-medium text-sm ${getOptionStyles(option)}`}
+            >
+              <span className="inline-block w-6 font-bold opacity-70">
+                {String.fromCharCode(65 + idx)}.
+              </span>
+              {option.replace(/^[A-Z]\.\s*/, '')}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+});
 
 export default function PracticePage() {
   const params = useParams();
@@ -47,7 +122,7 @@ export default function PracticePage() {
     if (subjectId && user) fetchQuestions();
   }, [subjectId, page, user]);
 
-  const handleOptionSelect = (qId, option, correctAnswer) => {
+  const handleOptionSelect = useCallback((qId, option, correctAnswer) => {
     if (selectedAnswers[qId]) return; // Disable if already answered
 
     setSelectedAnswers((prev) => ({
@@ -55,53 +130,33 @@ export default function PracticePage() {
       [qId]: option,
     }));
 
-    if (option === correctAnswer) {
+    // Use robust checking here as well for overall score logic
+    const normalize = (str) => (str || '').toString().trim().toLowerCase();
+    const optBody = normalize(option.replace(/^[A-Z]\.\s*/i, ''));
+    const ansBody = normalize((correctAnswer || '').replace(/^[A-Z]\.\s*/i, ''));
+    const isCorrect = normalize(option) === normalize(correctAnswer) || optBody === ansBody;
+
+    if (isCorrect) {
       setCorrectCount(c => c + 1);
     } else {
       setWrongCount(c => c + 1);
     }
-  };
+  }, [selectedAnswers]);
 
-  // Save practice stats when user leaves the page or finishes all questions
-  const savePracticeStats = useCallback(async () => {
+  // Save practice stats when user clicks "Save Progress"
+  // Fixed a massive bug where this was in a useEffect cleanup, causing an API call on EVERY single click!
+  const savePracticeStats = async () => {
     const attempted = Object.keys(selectedAnswers).length;
     if (attempted === 0 || !user) return;
 
     try {
       await api.post('/exam/submit', {
         subjectId,
-        totalQuestions: totalQs,
-        attempted,
-        correct: correctCount,
-        wrong: wrongCount,
+        answers: selectedAnswers, // Backend expects 'answers', not generic counts
       });
     } catch (err) {
+      console.error('Failed to save practice stats', err);
     }
-  }, [selectedAnswers, correctCount, wrongCount, subjectId, totalQs, user]);
-
-  // Save stats when navigating away
-  useEffect(() => {
-    return () => {
-      savePracticeStats();
-    };
-  }, [savePracticeStats]);
-
-  const getOptionStyles = (qId, option, correctAnswer) => {
-    const selected = selectedAnswers[qId];
-
-    if (!selected) {
-      return 'bg-slate-800 border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 text-gray-300 cursor-pointer';
-    }
-
-    if (option === correctAnswer) {
-      return 'bg-emerald-900/40 border-emerald-600 text-emerald-300 scale-[1.02] shadow-sm z-10';
-    }
-
-    if (selected === option && option !== correctAnswer) {
-      return 'bg-red-900/40 border-red-600 text-red-300';
-    }
-
-    return 'bg-slate-800 border-slate-700 text-gray-600 opacity-60 cursor-not-allowed';
   };
 
   if (authLoading || !user) {
@@ -171,44 +226,16 @@ export default function PracticePage() {
       <div className="space-y-8">
         {questions.map((q, index) => {
           const globalIndex = (page - 1) * 10 + index + 1;
-          const isAnswered = !!selectedAnswers[q._id];
-          const isCorrect = selectedAnswers[q._id] === q.correctAnswer;
-
+          const selectedOption = selectedAnswers[q._id];
+          
           return (
-            <div key={q._id} className="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
-              <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex justify-between items-start">
-                <h3 className="text-lg font-bold text-white font-serif leading-relaxed">
-                  <span className="text-emerald-400 mr-2">Q{globalIndex}.</span>
-                  {q.questionText}
-                </h3>
-                {isAnswered && (
-                  <div className="ml-4 shrink-0">
-                    {isCorrect ? (
-                      <CheckCircle2 className="h-6 w-6 text-emerald-500" />
-                    ) : (
-                      <XCircle className="h-6 w-6 text-red-500" />
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="p-6">
-                <div className="space-y-3">
-                  {q.options.map((option, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleOptionSelect(q._id, option, q.correctAnswer)}
-                      disabled={isAnswered}
-                      className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-300 mcq-option font-medium text-sm ${getOptionStyles(q._id, option, q.correctAnswer)}`}
-                    >
-                      <span className="inline-block w-6 font-bold opacity-70">
-                        {String.fromCharCode(65 + idx)}.
-                      </span>
-                      {option.replace(/^[A-Z]\.\s*/, '')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <PracticeQuestionCard 
+              key={q._id}
+              q={q}
+              globalIndex={globalIndex}
+              selectedOption={selectedOption}
+              onSelect={handleOptionSelect}
+            />
           );
         })}
       </div>

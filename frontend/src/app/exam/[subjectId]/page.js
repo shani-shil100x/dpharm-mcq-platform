@@ -6,6 +6,43 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 import { Loader2, Clock, CheckCircle2, XCircle, ChevronRight, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import React from 'react';
+
+// OPTIMIZATION: Memoized QuestionCard prevents all 50 questions from re-rendering
+// every time the user selects an answer for just one of them.
+const QuestionCard = React.memo(({ q, index, selectedOption, onSelect }) => {
+  return (
+    <div id={`q-${index}`} className="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
+      <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex items-center justify-between">
+        <h3 className="text-lg font-bold text-white font-serif leading-relaxed">
+          <span className="text-emerald-400 mr-2">Q{index + 1}.</span>
+          {q.questionText}
+        </h3>
+      </div>
+      <div className="p-6">
+        <div className="space-y-3">
+          {q.options.map((option, idx) => {
+            const isSelected = selectedOption === option;
+            return (
+              <button
+                key={idx}
+                onClick={() => onSelect(q._id, option)}
+                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 font-medium text-sm mcq-option
+                  ${isSelected ? 'bg-emerald-900/30 border-emerald-600 text-emerald-300 shadow-sm' : 'bg-slate-800 border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 text-gray-300'}
+                `}
+              >
+                <span className="inline-block w-6 font-bold opacity-70">
+                  {String.fromCharCode(65 + idx)}.
+                </span>
+                {option.replace(/^[A-Z]\.\s*/, '')}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  );
+});
 
 export default function ExamPage() {
   const params = useParams();
@@ -260,40 +297,15 @@ export default function ExamPage() {
       </div>
 
       <div className="space-y-8">
-        {questions.map((q, index) => {
-          const isAnswered = !!selectedAnswers[q._id];
-          return (
-            <div key={q._id} id={`q-${index}`} className="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
-              <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white font-serif leading-relaxed">
-                  <span className="text-emerald-400 mr-2">Q{index + 1}.</span>
-                  {q.questionText}
-                </h3>
-              </div>
-              <div className="p-6">
-                <div className="space-y-3">
-                  {q.options.map((option, idx) => {
-                    const isSelected = selectedAnswers[q._id] === option;
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => handleOptionSelect(q._id, option)}
-                        className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 font-medium text-sm mcq-option
-                          ${isSelected ? 'bg-emerald-900/30 border-emerald-600 text-emerald-300 shadow-sm' : 'bg-slate-800 border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 text-gray-300'}
-                        `}
-                      >
-                        <span className="inline-block w-6 font-bold opacity-70">
-                          {String.fromCharCode(65 + idx)}.
-                        </span>
-                        {option.replace(/^[A-Z]\.\s*/, '')}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {questions.map((q, index) => (
+          <QuestionCard
+            key={q._id}
+            q={q}
+            index={index}
+            selectedOption={selectedAnswers[q._id]}
+            onSelect={handleOptionSelect}
+          />
+        ))}
       </div>
       
       <div className="mt-12 text-center">

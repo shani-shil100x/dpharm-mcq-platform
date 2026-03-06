@@ -2,12 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import * as LucideIcons from 'lucide-react';
+// OPTIMIZATION: Only import strictly required icons to allow Next.js tree-shaking.
+// Previously, import * as LucideIcons pulled 1000+ SVGs into the client bundle, killing load speed.
+import { Book, Loader2, Library, Calculator, Pill, HeartPulse, Hospital, Atom, Dna } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '@/lib/axios';
 
+// Local icon registry so we can still dynamically map icons from the database safely
+const ICON_REGISTRY = {
+  Calculator,
+  Pill,
+  HeartPulse,
+  Hospital,
+  Atom,
+  Dna,
+  Book,
+};
+
 const SubjectIcon = ({ name, className }) => {
-  const IconComponent = LucideIcons[name] || LucideIcons.Book;
+  const IconComponent = ICON_REGISTRY[name] || Book;
   return <IconComponent className={className} />;
 };
 
@@ -41,7 +54,7 @@ export default function HomePage() {
 
       {loading ? (
         <div className="flex justify-center items-center py-20">
-          <LucideIcons.Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />
+          <Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -65,7 +78,7 @@ export default function HomePage() {
                 </div>
                 
                 <div className="flex items-center text-sm text-gray-400 mb-6 relative z-10">
-                  <LucideIcons.Library className="h-4 w-4 mr-1.5" />
+                  <Library className="h-4 w-4 mr-1.5" />
                   <span>{subject.totalQuestions} Questions Available</span>
                 </div>
                 

@@ -16,9 +16,13 @@ const getQuestions = async (req, res, next) => {
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
 
+    // OPTIMIZATION: Use .lean() to return raw JSON instead of heavy Mongoose Documents.
+    // OPTIMIZATION: Exclude __v, createdAt, updatedAt as frontend doesn't need them.
     const questions = await Question.find({ subjectId })
+      .select('-__v -createdAt -updatedAt')
       .skip((pageNum - 1) * limitNum)
-      .limit(limitNum);
+      .limit(limitNum)
+      .lean();
 
     const total = await Question.countDocuments({ subjectId });
 

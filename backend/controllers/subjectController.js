@@ -8,17 +8,32 @@ const ExamResult = require('../models/ExamResult');
 // @access  Public
 const getSubjects = async (req, res, next) => {
   try {
-    const subjects = await Subject.find({});
-    
-    // Dynamically calculate totalQuestions for each subject ensuring 100% accuracy
-    const subjectsWithCounts = await Promise.all(
-      subjects.map(async (subject) => {
-        const count = await Question.countDocuments({ subjectId: subject._id });
-        const subjectObj = subject.toObject();
-        subjectObj.totalQuestions = count;
-        return subjectObj;
-      })
-    );
+    // 1. High-Performance MongoDB Aggregation
+    // This replaces an N+1 query bottleneck by having the database do the counting
+    // rather than dragging all documents into Node.js and looping them.
+    const subjectsWithCounts = await Subject.aggregate([
+      {
+        $lookup: {
+          from: 'questions',         // The collection name in MongoDB for Question model
+          localField: '_id',         // Subject's _id
+          foreignField: 'subjectId', // Question's subjectId reference
+          as: 'questionsList',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          subjectName: 1,
+          subjectIcon: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          totalQuestions: { $size: '$questionsList' }, // Instantly get the count
+        },
+      },
+      {
+        $sort: { subjectName: 1 } // Ensure consistent alphabetical ordering
+      }
+    ]);
 
     res.json(subjectsWithCounts);
   } catch (error) {

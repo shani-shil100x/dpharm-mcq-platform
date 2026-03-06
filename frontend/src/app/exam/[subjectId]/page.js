@@ -229,10 +229,10 @@ export default function ExamPage() {
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">{subject?.subjectName} Mock Exam</h1>
           
           <ul className="text-left space-y-4 mb-10 text-gray-600 dark:text-gray-300 max-w-sm mx-auto">
-            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> Total Questions: <strong className="ml-1 text-gray-900 dark:text-white">{questions.length}</strong></li>
-            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> Time Limit: <strong className="ml-1 text-gray-900 dark:text-white">{questions.length} Minutes</strong></li>
-            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> Auto-submission when time ends</li>
-            <li className="flex items-center"><AlertTriangle className="w-5 h-5 mr-3 text-amber-500 dark:text-amber-400" /> Answers cannot be changed after submission</li>
+            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> <span className="text-gray-700 dark:text-gray-300">Total Questions:</span> <strong className="ml-1 text-gray-900 dark:text-white">{questions.length}</strong></li>
+            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> <span className="text-gray-700 dark:text-gray-300">Time Limit:</span> <strong className="ml-1 text-gray-900 dark:text-white">{questions.length} Minutes</strong></li>
+            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> <span className="text-gray-700 dark:text-gray-300">Auto-submission when time ends</span></li>
+            <li className="flex items-center"><AlertTriangle className="w-5 h-5 mr-3 text-amber-500 dark:text-amber-400" /> <span className="text-gray-700 dark:text-gray-300">Answers cannot be changed after submission</span></li>
           </ul>
 
           <button onClick={startExam} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-emerald-200 dark:shadow-none transition-all transform hover:-translate-y-1">
@@ -247,9 +247,9 @@ export default function ExamPage() {
   const isWarning = timeLeft <= 300; // 5 mins
   return (
     <div className="max-w-4xl mx-auto pb-24 relative">
-      <div className={`sticky top-16 z-40 p-4 border-b shadow-sm rounded-b-2xl mb-8 flex items-center justify-between transition-colors duration-300 ${isWarning ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-slate-700'}`}>
-        <div className="font-bold text-lg flex items-center">
-          <Clock className={`w-5 h-5 mr-2 ${isWarning ? 'animate-pulse' : ''}`} />
+      <div className={`sticky top-16 z-40 p-4 border-b shadow-sm rounded-b-2xl mb-8 flex items-center justify-between transition-colors duration-300 ${isWarning ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' : 'bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-200 border-gray-200 dark:border-slate-700'}`}>
+        <div className="font-bold text-lg flex items-center text-gray-900 dark:text-white">
+          <Clock className={`w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400 ${isWarning ? 'animate-pulse text-red-600 dark:text-red-400' : ''}`} />
           {formatTime(timeLeft)}
         </div>
         <div className="text-sm font-medium opacity-80">

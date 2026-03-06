@@ -96,11 +96,11 @@ export default function PracticePage() {
     }
 
     if (option === correctAnswer) {
-      return 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-500 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 scale-[1.02] shadow-sm z-10';
+      return 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-500 dark:border-emerald-600 text-emerald-900 dark:text-emerald-300 scale-[1.02] shadow-sm z-10';
     }
 
     if (selected === option && option !== correctAnswer) {
-      return 'bg-red-100 dark:bg-red-900/40 border-red-500 dark:border-red-600 text-red-800 dark:text-red-300';
+      return 'bg-red-100 dark:bg-red-900/40 border-red-500 dark:border-red-600 text-red-900 dark:text-red-300';
     }
 
     return 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 dark:text-gray-600 opacity-60 cursor-not-allowed';

@@ -79,8 +79,8 @@ export default function UserDashboard() {
         </div>
         <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <Trophy className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4 transition-colors" />
-          <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2 transition-colors">No attempts yet!</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto transition-colors">Start practicing MCQs or take a mock exam to see your performance stats here.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-200 mb-2 transition-colors">No attempts yet!</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto transition-colors">Start practicing MCQs or take a mock exam to see your performance stats here.</p>
           <Link href="/" className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all">
             Start Practicing <ArrowRight className="h-5 w-5" />
           </Link>

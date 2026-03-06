@@ -56,6 +56,10 @@ app.use(cors({
 
 app.use(express.json({ limit: '5mb' }));
 
+app.get('/', (req, res) => {
+  res.send('D.Pharm MCQ Backend is running perfectly on Vercel!');
+});
+
 app.get('/api', (req, res) => {
   res.send('API is running...');
 });

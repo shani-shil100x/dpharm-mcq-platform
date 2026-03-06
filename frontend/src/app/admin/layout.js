@@ -36,7 +36,7 @@ export default function AdminLayout({ children }) {
   return (
     <div className="flex flex-col md:flex-row gap-6">
       <aside className="w-full md:w-64 shrink-0">
-        <nav className="space-y-2 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <nav className="space-y-2 bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-700">
           <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">
             Admin Menu
           </div>
@@ -48,11 +48,11 @@ export default function AdminLayout({ children }) {
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-emerald-900/30 text-emerald-400'
+                    : 'text-gray-300 hover:bg-slate-700'
                 }`}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? 'text-emerald-600' : 'text-gray-400'}`} />
+                <item.icon className={`h-5 w-5 ${isActive ? 'text-emerald-400' : 'text-gray-500'}`} />
                 {item.name}
               </Link>
             );

@@ -69,77 +69,76 @@ export default function UserDashboard() {
     attempted: s.attempted,
   }));
 
-  // If no data at all, show a friendly empty state
-  if (totalAttempted === 0 && examHistory.length === 0) {
-    return (
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Welcome, {user?.name}</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 transition-colors">Here is an overview of your practice performance.</p>
+    if (totalAttempted === 0 && examHistory.length === 0) {
+      return (
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-white transition-colors">Welcome, {user?.name}</h1>
+            <p className="text-gray-400 mt-2 transition-colors">Here is an overview of your practice performance.</p>
+          </div>
+          <div className="text-center py-20 bg-slate-800 rounded-2xl shadow-sm border border-slate-700 transition-colors duration-300">
+            <Trophy className="h-16 w-16 text-gray-600 mx-auto mb-4 transition-colors" />
+            <h2 className="text-2xl font-bold text-gray-200 mb-2 transition-colors">No attempts yet!</h2>
+            <p className="text-gray-400 mb-6 max-w-md mx-auto transition-colors">Start practicing MCQs or take a mock exam to see your performance stats here.</p>
+            <Link href="/" className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all">
+              Start Practicing <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
         </div>
-        <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors duration-300">
-          <Trophy className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4 transition-colors" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-200 mb-2 transition-colors">No attempts yet!</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto transition-colors">Start practicing MCQs or take a mock exam to see your performance stats here.</p>
-          <Link href="/" className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all">
-            Start Practicing <ArrowRight className="h-5 w-5" />
-          </Link>
-        </div>
-      </div>
-    );
-  }
+      );
+    }
 
   return (
     <div className="container mx-auto px-4 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors">Welcome, {user?.name}</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2 transition-colors">Here is an overview of your practice performance.</p>
+        <h1 className="text-3xl font-bold text-white transition-colors">Welcome, {user?.name}</h1>
+        <p className="text-gray-400 mt-2 transition-colors">Here is an overview of your practice performance.</p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 flex items-center transition-colors duration-300">
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl mr-4 transition-colors">
-            <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 flex items-center transition-colors duration-300">
+          <div className="p-4 bg-blue-900/30 rounded-xl mr-4 transition-colors">
+            <Target className="h-8 w-8 text-blue-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Attempted</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalAttempted}</p>
+            <p className="text-sm font-medium text-gray-400">Attempted</p>
+            <p className="text-2xl font-bold text-white">{totalAttempted}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 flex items-center transition-colors duration-300">
-          <div className="p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl mr-4 transition-colors">
-            <CheckCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 flex items-center transition-colors duration-300">
+          <div className="p-4 bg-emerald-900/30 rounded-xl mr-4 transition-colors">
+            <CheckCircle className="h-8 w-8 text-emerald-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Correct</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalCorrect}</p>
+            <p className="text-sm font-medium text-gray-400">Correct</p>
+            <p className="text-2xl font-bold text-white">{totalCorrect}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 flex items-center transition-colors duration-300">
-          <div className="p-4 bg-red-50 dark:bg-red-900/30 rounded-xl mr-4 transition-colors">
-            <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 flex items-center transition-colors duration-300">
+          <div className="p-4 bg-red-900/30 rounded-xl mr-4 transition-colors">
+            <XCircle className="h-8 w-8 text-red-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Wrong</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalWrong}</p>
+            <p className="text-sm font-medium text-gray-400">Wrong</p>
+            <p className="text-2xl font-bold text-white">{totalWrong}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 flex items-center transition-colors duration-300">
-          <div className="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-xl mr-4 transition-colors">
-            <span className="text-xl font-bold text-purple-600 dark:text-purple-400">%</span>
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 flex items-center transition-colors duration-300">
+          <div className="p-4 bg-purple-900/30 rounded-xl mr-4 transition-colors">
+            <span className="text-xl font-bold text-purple-400">%</span>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Overall Accuracy</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{overallAccuracy}%</p>
+            <p className="text-sm font-medium text-gray-400">Overall Accuracy</p>
+            <p className="text-2xl font-bold text-white">{overallAccuracy}%</p>
           </div>
         </div>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 transition-colors duration-300">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Correct vs Wrong Ratio</h3>
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 transition-colors duration-300">
+          <h3 className="text-lg font-bold text-white mb-6">Correct vs Wrong Ratio</h3>
           {totalAttempted > 0 ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -167,8 +166,8 @@ export default function UserDashboard() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 transition-colors duration-300">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Subject Accuracy (%)</h3>
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 transition-colors duration-300">
+          <h3 className="text-lg font-bold text-white mb-6">Subject Accuracy (%)</h3>
           {stats.length > 0 ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -182,49 +181,49 @@ export default function UserDashboard() {
               </ResponsiveContainer>
             </div>
           ) : (
-             <p className="text-center text-gray-500 dark:text-gray-400 py-20">No subject data available to chart.</p>
+             <p className="text-center text-gray-400 py-20">No subject data available to chart.</p>
           )}
         </div>
       </div>
 
       {/* Exam History */}
       {examHistory.length > 0 && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 transition-colors duration-300">
           <div className="flex items-center gap-3 mb-6">
-            <Clock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Attempts</h3>
+            <Clock className="h-5 w-5 text-gray-500" />
+            <h3 className="text-lg font-bold text-white">Recent Attempts</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-              <thead className="bg-gray-50 dark:bg-slate-700/50">
+            <table className="min-w-full divide-y divide-slate-700">
+              <thead className="bg-slate-700/50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Subject</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Total</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Attempted</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Correct</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Wrong</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Accuracy</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Subject</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Total</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Attempted</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Correct</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Wrong</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">Accuracy</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+              <tbody className="divide-y divide-slate-700">
                 {examHistory.slice(0, 20).map((exam) => (
-                  <tr key={exam._id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-200">{exam.subjectId?.subjectName || 'Unknown'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">{exam.totalQuestions}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">{exam.attempted}</td>
+                  <tr key={exam._id} className="hover:bg-slate-700/50 transition-colors">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-200">{exam.subjectId?.subjectName || 'Unknown'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-400 text-center">{exam.totalQuestions}</td>
+                    <td className="px-4 py-3 text-sm text-gray-400 text-center">{exam.attempted}</td>
                     <td className="px-4 py-3 text-sm text-center">
-                      <span className="text-emerald-700 font-bold">{exam.correct}</span>
+                      <span className="text-emerald-500 font-bold">{exam.correct}</span>
                     </td>
                     <td className="px-4 py-3 text-sm text-center">
-                      <span className="text-red-600 dark:text-red-400 font-bold">{exam.wrong}</span>
+                      <span className="text-red-400 font-bold">{exam.wrong}</span>
                     </td>
                     <td className="px-4 py-3 text-sm text-center">
-                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${exam.accuracy >= 70 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' : exam.accuracy >= 40 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${exam.accuracy >= 70 ? 'bg-emerald-900/40 text-emerald-400' : exam.accuracy >= 40 ? 'bg-amber-900/40 text-amber-400' : 'bg-red-900/40 text-red-400'}`}>
                         {exam.accuracy?.toFixed(0)}%
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{new Date(exam.completedAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-sm text-gray-400">{new Date(exam.completedAt).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>

@@ -56,15 +56,15 @@ export default function BulkUploadPage() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-4xl">
+    <div className="bg-slate-800 rounded-xl shadow-sm border border-slate-700 p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Bulk Upload MCQs</h1>
-        <p className="text-sm text-gray-500 mt-1">Paste 30-40 questions at once using the specific format.</p>
+        <h1 className="text-2xl font-bold text-white">Bulk Upload MCQs</h1>
+        <p className="text-sm text-gray-400 mt-1">Paste 30-40 questions at once using the specific format.</p>
       </div>
 
-      <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 mb-8">
-        <h3 className="text-sm font-semibold text-emerald-800 mb-2">Required Format Example:</h3>
-        <pre className="text-xs text-emerald-700 font-mono bg-white p-3 rounded border border-emerald-100 overflow-x-auto">
+      <div className="bg-emerald-900/20 border border-emerald-800/50 rounded-lg p-4 mb-8">
+        <h3 className="text-sm font-semibold text-emerald-300 mb-2">Required Format Example:</h3>
+        <pre className="text-xs text-emerald-400 font-mono bg-slate-800/50 p-3 rounded border border-emerald-800/50 overflow-x-auto">
 {`Q1: What is the capital of India?
 A. Mumbai
 B. Kolkata
@@ -82,7 +82,7 @@ Answer: B. Carbon Dioxide`}
       </div>
 
       {status.message && (
-        <div className={`mb-6 p-4 rounded-lg flex items-start text-sm ${status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+        <div className={`mb-6 p-4 rounded-lg flex items-start text-sm ${status.type === 'success' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
           {status.type === 'success' ? <CheckCircle2 className="h-5 w-5 mr-3 flex-shrink-0" /> : <AlertCircle className="h-5 w-5 mr-3 flex-shrink-0" />}
           <p>{status.message}</p>
         </div>
@@ -90,11 +90,11 @@ Answer: B. Carbon Dioxide`}
 
       <form onSubmit={handleUpload} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Select Subject</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Select Subject</label>
           <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
-            className="block w-full md:w-1/2 border border-gray-300 rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="block w-full md:w-1/2 border border-slate-600 bg-slate-700 text-white rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             required
           >
             <option value="">-- Choose a Subject --</option>
@@ -105,13 +105,13 @@ Answer: B. Carbon Dioxide`}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Pasted Questions</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Pasted Questions</label>
           <textarea
             value={rawText}
             onChange={(e) => setRawText(e.target.value)}
             rows={12}
             required
-            className="block w-full border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm"
+            className="block w-full border border-slate-600 bg-slate-700 text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm"
             placeholder="Paste your questions here following the format..."
           />
         </div>

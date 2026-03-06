@@ -5,21 +5,15 @@
   --color-slate-900: #0f172a;
 }
 
+/* Permanent dark mode */
 :root {
-  --bg-color: #f8fafc;
-  --text-color: #0f172a;
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
 }
 
-.dark {
-  --bg-color: #0f172a; /* Custom dark slate for background */
-  --text-color: #f8fafc; /* Light text for dark mode */
-}
-
-/* Base tailwind resets / dark mode mappings */
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom animations for green/red highlights in MCQ */

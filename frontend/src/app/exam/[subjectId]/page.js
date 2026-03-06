@@ -158,8 +158,8 @@ export default function ExamPage() {
   if (questions.length === 0) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300">Not enough questions for an exam.</h2>
-        <Link href="/" className="text-emerald-600 dark:text-emerald-400 mt-4 inline-block hover:underline hover:text-emerald-700 dark:hover:text-emerald-300 font-medium">
+        <h2 className="text-2xl font-bold text-gray-300">Not enough questions for an exam.</h2>
+        <Link href="/" className="text-emerald-400 mt-4 inline-block hover:underline hover:text-emerald-300 font-medium">
           Back to Home
         </Link>
       </div>
@@ -169,47 +169,47 @@ export default function ExamPage() {
   if (examFinished && resultData) {
     return (
       <div className="max-w-2xl mx-auto py-10">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-slate-700 transition-colors duration-300">
-          <div className="bg-emerald-600 dark:bg-emerald-700 p-8 text-center transition-colors">
+        <div className="bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-700 transition-colors duration-300">
+          <div className="bg-emerald-700 p-8 text-center transition-colors">
              <h2 className="text-3xl font-bold text-white mb-2">Exam Completed!</h2>
              <p className="text-emerald-100">{subject?.subjectName} - Final Result</p>
           </div>
           
           <div className="p-8">
             <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl p-4 text-center transition-colors">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Questions</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{resultData.totalQuestions}</p>
+              <div className="bg-slate-700/50 border border-slate-600 rounded-xl p-4 text-center transition-colors">
+                <p className="text-sm font-medium text-gray-400 mb-1">Total Questions</p>
+                <p className="text-2xl font-bold text-white">{resultData.totalQuestions}</p>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-xl p-4 text-center transition-colors">
-                <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">Attempted</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{resultData.attempted}</p>
+              <div className="bg-blue-900/20 border border-blue-800/50 rounded-xl p-4 text-center transition-colors">
+                <p className="text-sm font-medium text-blue-400 mb-1">Attempted</p>
+                <p className="text-2xl font-bold text-blue-100">{resultData.attempted}</p>
               </div>
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 rounded-xl p-4 text-center transition-colors">
-                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-1">Correct</p>
-                <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-100">{resultData.correct}</p>
+              <div className="bg-emerald-900/20 border border-emerald-800/50 rounded-xl p-4 text-center transition-colors">
+                <p className="text-sm font-medium text-emerald-400 mb-1">Correct</p>
+                <p className="text-2xl font-bold text-emerald-100">{resultData.correct}</p>
               </div>
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded-xl p-4 text-center transition-colors">
-                <p className="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Wrong</p>
-                <p className="text-2xl font-bold text-red-700 dark:text-red-100">{resultData.wrong}</p>
+              <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4 text-center transition-colors">
+                <p className="text-sm font-medium text-red-400 mb-1">Wrong</p>
+                <p className="text-2xl font-bold text-red-100">{resultData.wrong}</p>
               </div>
             </div>
 
             <div className="flex justify-center mb-8">
               <div className="relative inline-flex items-center justify-center">
                  <svg className="w-32 h-32 transform -rotate-90">
-                    <circle className="text-gray-200" strokeWidth="12" stroke="currentColor" fill="transparent" r="50" cx="64" cy="64" />
+                    <circle className="text-gray-200 opacity-10" strokeWidth="12" stroke="currentColor" fill="transparent" r="50" cx="64" cy="64" />
                     <circle className="text-emerald-500" strokeWidth="12" strokeDasharray={50 * 2 * Math.PI} strokeDashoffset={50 * 2 * Math.PI - (resultData.accuracy / 100) * 50 * 2 * Math.PI} strokeLinecap="round" stroke="currentColor" fill="transparent" r="50" cx="64" cy="64" />
                  </svg>
-                 <span className="absolute text-2xl font-extrabold text-emerald-700">{resultData.accuracy.toFixed(0)}%</span>
+                 <span className="absolute text-2xl font-extrabold text-emerald-500">{resultData.accuracy.toFixed(0)}%</span>
               </div>
             </div>
 
             <div className="flex justify-center gap-4 mt-8">
-              <Link href={`/practice/${subjectId}`} className="px-6 py-3 font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition-colors">
+              <Link href={`/practice/${subjectId}`} className="px-6 py-3 font-semibold text-gray-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors">
                 Review Questions
               </Link>
-              <Link href="/dashboard" className="px-6 py-3 font-semibold text-white bg-emerald-600 hover:bg-emerald-700 dark:hover:bg-emerald-500 rounded-xl shadow-md transition-colors">
+              <Link href="/dashboard" className="px-6 py-3 font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-md transition-colors">
                 Go to Dashboard
               </Link>
             </div>
@@ -222,20 +222,20 @@ export default function ExamPage() {
   if (!isExamStarted) {
     return (
       <div className="max-w-xl mx-auto py-20 text-center">
-        <div className="bg-white dark:bg-slate-800 p-10 rounded-3xl shadow-lg border border-gray-100 dark:border-slate-700 transition-colors duration-300">
-          <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-             <Clock className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+        <div className="bg-slate-800 p-10 rounded-3xl shadow-lg border border-slate-700 transition-colors duration-300">
+          <div className="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+             <Clock className="w-10 h-10 text-emerald-400" />
           </div>
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">{subject?.subjectName} Mock Exam</h1>
+          <h1 className="text-3xl font-extrabold text-white mb-4">{subject?.subjectName} Mock Exam</h1>
           
-          <ul className="text-left space-y-4 mb-10 text-gray-600 dark:text-gray-300 max-w-sm mx-auto">
-            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> <span className="text-gray-700 dark:text-gray-300">Total Questions:</span> <strong className="ml-1 text-gray-900 dark:text-white">{questions.length}</strong></li>
-            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> <span className="text-gray-700 dark:text-gray-300">Time Limit:</span> <strong className="ml-1 text-gray-900 dark:text-white">{questions.length} Minutes</strong></li>
-            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-500 dark:text-emerald-400" /> <span className="text-gray-700 dark:text-gray-300">Auto-submission when time ends</span></li>
-            <li className="flex items-center"><AlertTriangle className="w-5 h-5 mr-3 text-amber-500 dark:text-amber-400" /> <span className="text-gray-700 dark:text-gray-300">Answers cannot be changed after submission</span></li>
+          <ul className="text-left space-y-4 mb-10 text-gray-300 max-w-sm mx-auto">
+            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-400" /> <span className="text-gray-300">Total Questions:</span> <strong className="ml-1 text-white">{questions.length}</strong></li>
+            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-400" /> <span className="text-gray-300">Time Limit:</span> <strong className="ml-1 text-white">{questions.length} Minutes</strong></li>
+            <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-400" /> <span className="text-gray-300">Auto-submission when time ends</span></li>
+            <li className="flex items-center"><AlertTriangle className="w-5 h-5 mr-3 text-amber-400" /> <span className="text-gray-300">Answers cannot be changed after submission</span></li>
           </ul>
 
-          <button onClick={startExam} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-emerald-200 dark:shadow-none transition-all transform hover:-translate-y-1">
+          <button onClick={startExam} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transition-all transform hover:-translate-y-1">
             Start Exam Now
           </button>
         </div>
@@ -247,9 +247,9 @@ export default function ExamPage() {
   const isWarning = timeLeft <= 300; // 5 mins
   return (
     <div className="max-w-4xl mx-auto pb-24 relative">
-      <div className={`sticky top-16 z-40 p-4 border-b shadow-sm rounded-b-2xl mb-8 flex items-center justify-between transition-colors duration-300 ${isWarning ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' : 'bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-200 border-gray-200 dark:border-slate-700'}`}>
-        <div className="font-bold text-lg flex items-center text-gray-900 dark:text-white">
-          <Clock className={`w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400 ${isWarning ? 'animate-pulse text-red-600 dark:text-red-400' : ''}`} />
+      <div className={`sticky top-16 z-40 p-4 border-b shadow-sm rounded-b-2xl mb-8 flex items-center justify-between transition-colors duration-300 ${isWarning ? 'bg-red-900/30 text-red-400 border-red-800' : 'bg-slate-800 text-gray-200 border-slate-700'}`}>
+        <div className="font-bold text-lg flex items-center text-white">
+          <Clock className={`w-5 h-5 mr-2 text-emerald-400 ${isWarning ? 'animate-pulse text-red-400' : ''}`} />
           {formatTime(timeLeft)}
         </div>
         <div className="text-sm font-medium opacity-80">
@@ -269,10 +269,10 @@ export default function ExamPage() {
         {questions.map((q, index) => {
           const isAnswered = !!selectedAnswers[q._id];
           return (
-            <div key={q._id} id={`q-${index}`} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
-              <div className="p-6 border-b border-gray-50 dark:border-slate-700/50 bg-gray-50/50 dark:bg-slate-800 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white font-serif leading-relaxed">
-                  <span className="text-emerald-600 dark:text-emerald-400 mr-2">Q{index + 1}.</span>
+            <div key={q._id} id={`q-${index}`} className="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
+              <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white font-serif leading-relaxed">
+                  <span className="text-emerald-400 mr-2">Q{index + 1}.</span>
                   {q.questionText}
                 </h3>
               </div>
@@ -285,7 +285,7 @@ export default function ExamPage() {
                         key={idx}
                         onClick={() => handleOptionSelect(q._id, option)}
                         className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 font-medium text-sm mcq-option
-                          ${isSelected ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-500 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 shadow-sm' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-gray-700 dark:text-gray-300'}
+                          ${isSelected ? 'bg-emerald-900/30 border-emerald-600 text-emerald-300 shadow-sm' : 'bg-slate-800 border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 text-gray-300'}
                         `}
                       >
                         <span className="inline-block w-6 font-bold opacity-70">

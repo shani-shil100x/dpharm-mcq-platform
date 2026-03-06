@@ -40,7 +40,6 @@ export default function PracticePage() {
         setTotalPages(data.pages);
         setTotalQs(data.total);
       } catch (error) {
-        console.error('Failed to load questions', error);
       } finally {
         setLoading(false);
       }
@@ -77,7 +76,6 @@ export default function PracticePage() {
         wrong: wrongCount,
       });
     } catch (err) {
-      console.error('Failed to save practice stats', err);
     }
   }, [selectedAnswers, correctCount, wrongCount, subjectId, totalQs, user]);
 

@@ -1,12 +1,46 @@
 const ExamResult = require('../models/ExamResult');
 const UserStats = require('../models/UserStats');
+const Question = require('../models/Question');
 
-// @desc    Submit exam and calculate results
+// @desc    Submit exam and calculate results (server-side scoring)
 // @route   POST /api/exam/submit
 // @access  Private
 const submitExam = async (req, res, next) => {
   try {
-    const { subjectId, totalQuestions, attempted, correct, wrong } = req.body;
+    const { subjectId, answers } = req.body;
+    // answers = { questionId: selectedOption, ... }
+
+    if (!subjectId) {
+      res.status(400);
+      throw new Error('subjectId is required');
+    }
+
+    // Fetch all questions for this subject to score server-side
+    const questions = await Question.find({ subjectId });
+
+    if (questions.length === 0) {
+      res.status(400);
+      throw new Error('No questions found for this subject');
+    }
+
+    const totalQuestions = questions.length;
+    let correct = 0;
+    let wrong = 0;
+    let attempted = 0;
+
+    // Score each answer server-side
+    const submittedAnswers = answers || {};
+    questions.forEach((q) => {
+      const userAnswer = submittedAnswers[q._id.toString()];
+      if (userAnswer) {
+        attempted++;
+        if (userAnswer === q.correctAnswer) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      }
+    });
 
     const accuracy = totalQuestions > 0 ? (correct / totalQuestions) * 100 : 0;
 
@@ -29,10 +63,10 @@ const submitExam = async (req, res, next) => {
       userStats.attempted += attempted;
       userStats.correct += correct;
       userStats.wrong += wrong;
-      
-      const totalAttemptedForAccuracy = userStats.attempted > 0 ? userStats.attempted : 1; // avoid division by zero
+
+      const totalAttemptedForAccuracy = userStats.attempted > 0 ? userStats.attempted : 1;
       userStats.accuracy = (userStats.correct / totalAttemptedForAccuracy) * 100;
-      
+
       await userStats.save();
     } else {
       userStats = new UserStats({

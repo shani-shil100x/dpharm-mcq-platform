@@ -12,8 +12,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.className} bg-slate-900 text-slate-50 min-h-screen flex flex-col`} suppressHydrationWarning>
+    <html lang="en">
+      <body className={`${inter.className} bg-slate-900 text-slate-50 min-h-screen flex flex-col`}>
         <AuthProvider>
           <Navbar />
           <main className="flex-grow w-full">

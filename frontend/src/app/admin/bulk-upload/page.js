@@ -17,8 +17,7 @@ export default function BulkUploadPage() {
         const { data } = await api.get('/subjects');
         setSubjects(data);
       } catch (error) {
-        console.error('Failed to fetch subjects', error);
-      }
+        }
     };
     fetchSubjects();
   }, []);

@@ -31,8 +31,7 @@ export default function ProgressPage() {
           setExamHistory(Array.isArray(examsRes.data) ? examsRes.data : []);
           setStats(Array.isArray(statsRes.data) ? statsRes.data : []);
         } catch (error) {
-          console.error('Failed to load progress data:', error);
-          setExamHistory([]);
+              setExamHistory([]);
           setStats([]);
         } finally {
           setLoadingData(false);

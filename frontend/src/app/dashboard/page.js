@@ -32,8 +32,7 @@ export default function UserDashboard() {
           setStats(Array.isArray(statsRes.data) ? statsRes.data : []);
           setExamHistory(Array.isArray(examsRes.data) ? examsRes.data : []);
         } catch (error) {
-          console.error('Failed to load dashboard data:', error);
-          setStats([]);
+              setStats([]);
           setExamHistory([]);
         } finally {
           setLoadingStats(false);

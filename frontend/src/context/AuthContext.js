@@ -21,7 +21,9 @@ export const AuthProvider = ({ children }) => {
         try {
           setUser(JSON.parse(userData));
         } catch (e) {
-          console.error('Invalid user data in cookies');
+          // Invalid cookie data — silently ignore
+          Cookies.remove('user');
+          Cookies.remove('token');
         }
       }
       setLoading(false);

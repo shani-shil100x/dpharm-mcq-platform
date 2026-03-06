@@ -11,26 +11,56 @@ const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
+    // Input validation
+    if (!name || !email || !password) {
+      res.status(400);
+      throw new Error('Please provide all required fields: name, email, and password.');
+    }
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (trimmedName.length < 2 || trimmedName.length > 50) {
+      res.status(400);
+      throw new Error('Name must be between 2 and 50 characters.');
+    }
+
+    if (password.length < 6) {
+      res.status(400);
+      throw new Error('Password must be at least 6 characters.');
+    }
+
+    if (password.length > 128) {
+      res.status(400);
+      throw new Error('Password is too long.');
+    }
+
     // Only allow @gmail.com emails
-    if (!email || !email.trim().toLowerCase().endsWith('@gmail.com')) {
+    if (!trimmedEmail.endsWith('@gmail.com')) {
       res.status(400);
       throw new Error('Only @gmail.com email addresses are allowed for registration.');
     }
 
-    const userExists = await User.findOne({ email: email.trim().toLowerCase() });
+    // Basic email format check
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      res.status(400);
+      throw new Error('Please enter a valid Gmail address.');
+    }
+
+    const userExists = await User.findOne({ email: trimmedEmail });
 
     if (userExists) {
       res.status(400);
       throw new Error('User already exists');
     }
 
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Provide default admin if needed for first user? Not strictly requested, but we can just register standard users.
     const user = await User.create({
-      name,
-      email,
+      name: trimmedName,
+      email: trimmedEmail,
       password: hashedPassword,
     });
 
@@ -58,7 +88,14 @@ const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!email || !password) {
+      res.status(400);
+      throw new Error('Please provide email and password.');
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    const user = await User.findOne({ email: trimmedEmail });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
@@ -82,7 +119,7 @@ const loginUser = async (req, res, next) => {
 // @access  Private/Admin
 const getUsers = async (req, res, next) => {
   try {
-    const users = await User.find({}).select('-password');
+    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
     next(error);

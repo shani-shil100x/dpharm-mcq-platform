@@ -21,8 +21,7 @@ export default function HomePage() {
         const { data } = await api.get('/subjects');
         setSubjects(data);
       } catch (error) {
-        console.error('Failed to load subjects', error);
-      } finally {
+        } finally {
         setLoading(false);
       }
     };

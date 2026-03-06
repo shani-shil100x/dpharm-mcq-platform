@@ -45,7 +45,6 @@ export default function ExamPage() {
         const { data } = await api.get(`/questions?subjectId=${subjectId}&limit=50`);
         setQuestions(data.questions);
       } catch (error) {
-        console.error('Failed to load exam data', error);
       } finally {
         setLoading(false);
       }
@@ -91,38 +90,33 @@ export default function ExamPage() {
     setIsSubmitting(true);
     setExamFinished(true);
 
-    let correct = 0;
-    let wrong = 0;
-    let attempted = Object.keys(selectedAnswers).length;
-
-    questions.forEach((q) => {
-      const ans = selectedAnswers[q._id];
-      if (ans) {
-        if (ans === q.correctAnswer) correct++;
-        else wrong++;
-      }
-    });
-
     try {
+      // Send answers to server for server-side scoring
       const { data } = await api.post('/exam/submit', {
         subjectId,
-        totalQuestions: questions.length,
-        attempted,
-        correct,
-        wrong,
+        answers: selectedAnswers,
       });
       setResultData(data);
     } catch (error) {
-      console.error('Exam submission failed', error);
       alert('Failed to save your exam results. But you can still view them.');
       
       // Local fallback if saving fails
+      let correct = 0;
+      let wrong = 0;
+      let attempted = Object.keys(selectedAnswers).length;
+      questions.forEach((q) => {
+        const ans = selectedAnswers[q._id];
+        if (ans) {
+          if (ans === q.correctAnswer) correct++;
+          else wrong++;
+        }
+      });
       setResultData({
         totalQuestions: questions.length,
         attempted,
         correct,
         wrong,
-        accuracy: (correct / questions.length) * 100
+        accuracy: questions.length > 0 ? (correct / questions.length) * 100 : 0
       });
     } finally {
       setIsSubmitting(false);

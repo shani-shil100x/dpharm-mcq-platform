@@ -7,9 +7,14 @@ const connectDB = require('./config/db');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
 dotenv.config();
-connectDB();
 
 const app = express();
+
+// Ensure DB is connected before handling any requests in serverless environment
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // Security headers
 app.use(helmet());

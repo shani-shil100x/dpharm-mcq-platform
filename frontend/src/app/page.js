@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 // OPTIMIZATION: Only import strictly required icons to allow Next.js tree-shaking.
 // Previously, import * as LucideIcons pulled 1000+ SVGs into the client bundle, killing load speed.
-import { Book, Loader2, Library, Calculator, Pill, HeartPulse, Hospital, Atom, Dna } from 'lucide-react';
+import { Book, Loader2, Library, Calculator, Pill, HeartPulse, Hospital, Atom, Dna, TestTubes, Leaf, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '@/lib/axios';
 
@@ -16,6 +16,9 @@ const ICON_REGISTRY = {
   Hospital,
   Atom,
   Dna,
+  TestTubes,
+  Leaf,
+  Users,
   Book,
 };
 

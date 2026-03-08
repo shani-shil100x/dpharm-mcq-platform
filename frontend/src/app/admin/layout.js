@@ -30,7 +30,6 @@ export default function AdminLayout({ children }) {
 
   const navItems = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Bulk Upload MCQ', href: '/admin/bulk-upload', icon: UploadCloud },
   ];
 
   return (

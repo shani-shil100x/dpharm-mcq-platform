@@ -8,13 +8,13 @@ const connectDB = async () => {
     return;
   }
 
-  if (!process.env.MONGO_URI) {
-    console.error('CRITICAL ERROR: MONGO_URI environment variable is not defined.');
+  if (!process.env.MONGODB_URI) {
+    console.error('CRITICAL ERROR: MONGODB_URI environment variable is not defined.');
     return; // Don't crash, let the API routes return errors gracefully
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGO_URI);
+    const db = await mongoose.connect(process.env.MONGODB_URI);
     isConnected = db.connections[0].readyState === 1;
     console.log(`MongoDB Connected: ${db.connection.host}`);
   } catch (error) {

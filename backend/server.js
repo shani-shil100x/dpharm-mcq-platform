@@ -6,7 +6,8 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
-dotenv.config();
+const path = require('path');
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
@@ -71,12 +72,14 @@ app.get('/api', (req, res) => {
 
 const authRoutes = require('./routes/authRoutes');
 const subjectRoutes = require('./routes/subjectRoutes');
+const chapterRoutes = require('./routes/chapterRoutes');
 const questionRoutes = require('./routes/questionRoutes');
 const userStatsRoutes = require('./routes/userStatsRoutes');
 const examRoutes = require('./routes/examRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/subjects', subjectRoutes);
+app.use('/api/chapters', chapterRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/user/stats', userStatsRoutes);
 app.use('/api/exam', examRoutes);

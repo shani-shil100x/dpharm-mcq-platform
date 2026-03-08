@@ -99,6 +99,8 @@ const deleteSubject = async (req, res, next) => {
 
     if (subject) {
       // Cascade delete all dependent data
+      const Chapter = require('../models/Chapter');
+      await Chapter.deleteMany({ subjectId: subject._id });
       await Question.deleteMany({ subjectId: subject._id });
       await UserStats.deleteMany({ subjectId: subject._id });
       await ExamResult.deleteMany({ subjectId: subject._id });

@@ -7,6 +7,11 @@ const questionSchema = new mongoose.Schema(
       ref: 'Subject',
       required: true,
     },
+    chapterId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Chapter',
+      required: true,
+    },
     questionText: {
       type: String,
       required: true,

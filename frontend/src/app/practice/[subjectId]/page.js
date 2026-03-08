@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
-import { Loader2, ArrowLeft, ArrowRight, ChevronLeft, CheckCircle2, XCircle, BarChart3 } from 'lucide-react';
+import { Loader2, ArrowLeft, ArrowRight, ChevronLeft, CheckCircle2, XCircle, BarChart3, ListTree } from 'lucide-react';
 import Link from 'next/link';
 
 // Helper for highly robust answer checking (handles "A. Option" vs "Option" mismatches)
@@ -86,8 +86,11 @@ export default function PracticePage() {
   const params = useParams();
   const subjectId = params.subjectId;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const chapterId = searchParams.get('chapterId');
   const { user, loading: authLoading } = useAuth();
 
+  const [chapters, setChapters] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -107,20 +110,27 @@ export default function PracticePage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    const fetchQuestions = async () => {
+    const fetchChaptersOrQuestions = async () => {
       setLoading(true);
       try {
-        const { data } = await api.get(`/questions?subjectId=${subjectId}&page=${page}&limit=10`);
-        setQuestions(data.questions);
-        setTotalPages(data.pages);
-        setTotalQs(data.total);
+        if (!chapterId && subjectId) {
+          // Fetch chapters for chapter selection screen
+          const { data } = await api.get(`/chapters?subjectId=${subjectId}`);
+          setChapters(data);
+        } else if (chapterId && subjectId) {
+          // Fetch questions for practice mode
+          const { data } = await api.get(`/questions?subjectId=${subjectId}&chapterId=${chapterId}&page=${page}&limit=10`);
+          setQuestions(data.questions);
+          setTotalPages(data.pages);
+          setTotalQs(data.total);
+        }
       } catch (error) {
       } finally {
         setLoading(false);
       }
     };
-    if (subjectId && user) fetchQuestions();
-  }, [subjectId, page, user]);
+    if (subjectId && user) fetchChaptersOrQuestions();
+  }, [subjectId, chapterId, page, user]);
 
   const handleOptionSelect = useCallback((qId, option, correctAnswer) => {
     if (selectedAnswers[qId]) return; // Disable if already answered
@@ -152,6 +162,7 @@ export default function PracticePage() {
     try {
       await api.post('/exam/submit', {
         subjectId,
+        chapterId,
         answers: selectedAnswers, // Backend expects 'answers', not generic counts
       });
     } catch (err) {
@@ -167,13 +178,56 @@ export default function PracticePage() {
     );
   }
 
-  if (loading && questions.length === 0) {
+  if (loading && questions.length === 0 && chapters.length === 0) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />
       </div>
     );
   }
+
+  // --- CHAPTER SELECTION SCREEN ---
+  if (!chapterId) {
+    return (
+      <div className="max-w-4xl mx-auto pb-20 px-4">
+        <div className="mb-8 flex items-center justify-between">
+          <Link href="/" className="text-gray-400 hover:text-gray-100 transition-colors flex items-center text-sm font-medium">
+            <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to Subjects
+          </Link>
+        </div>
+        
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-white mb-3">Select a <span className="text-emerald-400">Chapter</span></h1>
+          <p className="text-gray-400">Choose a chapter to begin your practice session.</p>
+        </div>
+
+        {chapters.length === 0 ? (
+          <div className="text-center py-20 bg-slate-800 rounded-xl border border-slate-700">
+            <ListTree className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-300">No chapters found.</h2>
+            <p className="text-gray-500 mt-2">This subject doesn't have any chapters yet.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {chapters.map((chapter) => (
+              <Link 
+                key={chapter._id} 
+                href={`/practice/${subjectId}?chapterId=${chapter._id}`}
+                className="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 transition-all duration-300 flex justify-between items-center group"
+              >
+                <div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">{chapter.chapterName}</h3>
+                  <p className="text-sm text-gray-400 mt-1">{chapter.totalQuestions} Questions</p>
+                </div>
+                <ArrowRight className="text-gray-500 group-hover:text-emerald-400 transition-colors" />
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  // --------------------------------
 
   if (questions.length === 0) {
     return (
@@ -192,8 +246,8 @@ export default function PracticePage() {
   return (
     <div className="max-w-3xl mx-auto pb-20">
       <div className="mb-8 flex items-center justify-between">
-        <Link href="/" className="text-gray-400 hover:text-gray-100 transition-colors flex items-center text-sm font-medium">
-          <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
+        <Link href={`/practice/${subjectId}`} className="text-gray-400 hover:text-gray-100 transition-colors flex items-center text-sm font-medium">
+          <ArrowLeft className="h-4 w-4 mr-1.5" /> Chapters
         </Link>
         <div className="bg-emerald-900/30 text-emerald-400 px-3 py-1 text-xs font-bold rounded-full">
           Total: {totalQs} Questions

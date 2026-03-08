@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
-import { Edit2, Trash2, Plus, Loader2, Users, BookOpen, FileQuestion, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Edit2, Trash2, Plus, Loader2, Users, BookOpen, FileQuestion, Upload, CheckCircle2, AlertCircle, ListTree } from 'lucide-react';
+import ChaptersModal from './components/ChaptersModal';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -37,10 +38,14 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [mcqs, setMcqs] = useState([]);
   const [selectedSubjectId, setSelectedSubjectId] = useState('');
+  const [selectedChapterId, setSelectedChapterId] = useState('');
+  const [manageChaptersDropdown, setManageChaptersDropdown] = useState([]);
 
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMcqModalOpen, setIsMcqModalOpen] = useState(false);
+  const [isChaptersModalOpen, setIsChaptersModalOpen] = useState(false);
+  const [activeSubjectForChapters, setActiveSubjectForChapters] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Subject Form
@@ -54,15 +59,20 @@ export default function AdminDashboard() {
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState('');
 
-  // Bulk Upload
+  // Bulk Upload (now chapter-specific)
   const [uploadSubjectId, setUploadSubjectId] = useState('');
+  const [uploadChapterId, setUploadChapterId] = useState('');
+  const [uploadChapterName, setUploadChapterName] = useState('');
   const [rawText, setRawText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
-  // Quick-navigate to upload tab with a specific subject pre-selected
-  const goToUploadForSubject = (subjectId) => {
+  // Quick-navigate to upload tab with a specific chapter pre-selected
+  const goToUploadForChapter = (subjectId, chapterId, chapterName) => {
     setUploadSubjectId(subjectId);
+    setUploadChapterId(chapterId);
+    setUploadChapterName(chapterName);
     setActiveTab('upload');
+    setIsChaptersModalOpen(false);
   };
   const [uploadStatus, setUploadStatus] = useState({ type: '', message: '' });
 
@@ -80,7 +90,19 @@ export default function AdminDashboard() {
         const { data: subData } = await api.get('/subjects');
         setSubjects(subData);
         if (selectedSubjectId) {
-          const { data } = await api.get(`/questions?subjectId=${selectedSubjectId}&limit=500`);
+          try {
+            const { data } = await api.get(`/chapters?subjectId=${selectedSubjectId}`);
+            setManageChaptersDropdown(data);
+          } catch (e) {
+            setManageChaptersDropdown([]);
+          }
+        } else {
+          setManageChaptersDropdown([]);
+          setSelectedChapterId('');
+        }
+        
+        if (selectedSubjectId && selectedChapterId) {
+          const { data } = await api.get(`/questions?subjectId=${selectedSubjectId}&chapterId=${selectedChapterId}&limit=500`);
           setMcqs(data.questions || []);
         } else {
           setMcqs([]);
@@ -92,7 +114,7 @@ export default function AdminDashboard() {
     }
   };
 
-  useEffect(() => { fetchData(); }, [activeTab, selectedSubjectId]);
+  useEffect(() => { fetchData(); }, [activeTab, selectedSubjectId, selectedChapterId]);
 
   // ========== Subject Handlers ==========
   const handleOpenSubjectModal = (subject = null) => {
@@ -200,6 +222,7 @@ export default function AdminDashboard() {
     try {
       const { data } = await api.post('/questions/bulk-upload', {
         subjectId: uploadSubjectId,
+        chapterId: uploadChapterId,
         rawText,
       });
       setUploadStatus({ type: 'success', message: data.message });
@@ -216,7 +239,7 @@ export default function AdminDashboard() {
 
   const tabs = [
     { key: 'subjects', label: 'Manage Subjects', icon: BookOpen },
-    { key: 'upload', label: 'Upload MCQs', icon: Upload },
+    { key: 'upload', label: 'Upload MCQs', icon: Upload }, // Will hide unless uploading is active
     { key: 'mcqs', label: 'Manage MCQs', icon: FileQuestion },
     { key: 'users', label: 'View Users', icon: Users },
   ];
@@ -228,7 +251,7 @@ export default function AdminDashboard() {
       <div className="bg-slate-800 rounded-xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
         {/* Tabs */}
         <div className="flex overflow-x-auto border-b border-slate-700 transition-colors">
-          {tabs.map(({ key, label, icon: Icon }) => (
+          {tabs.filter(tab => tab.key !== 'upload' || (activeTab === 'upload')).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
@@ -272,7 +295,13 @@ export default function AdminDashboard() {
                           <td className="px-6 py-4 text-sm text-gray-400">{s.subjectIcon}</td>
                           <td className="px-6 py-4 text-sm text-gray-400">{s.totalQuestions}</td>
                           <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
-                            <button onClick={() => goToUploadForSubject(s._id)} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-emerald-900/40 text-emerald-400 rounded-lg hover:bg-emerald-900/60 transition-colors" title="Upload MCQs for this subject"><Upload className="h-3.5 w-3.5" /> Upload MCQs</button>
+                            <button 
+                              onClick={() => { setActiveSubjectForChapters(s); setIsChaptersModalOpen(true); }} 
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-purple-900/40 text-purple-400 rounded-lg hover:bg-purple-900/60 transition-colors" 
+                              title="Manage Chapters"
+                            >
+                              <ListTree className="h-3.5 w-3.5" /> Chapters
+                            </button>
                             <button onClick={() => handleOpenSubjectModal(s)} className="text-blue-400 hover:text-blue-300" title="Edit subject"><Edit2 className="h-4 w-4 inline" /></button>
                             <button onClick={() => handleDeleteSubject(s._id)} className="text-red-400 hover:text-red-300" title="Delete subject"><Trash2 className="h-4 w-4 inline" /></button>
                           </td>
@@ -323,18 +352,11 @@ Answer: B. Carbon Dioxide`}
 
                 <form onSubmit={handleBulkUpload} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2 transition-colors">Select Subject</label>
-                    <select
-                      value={uploadSubjectId}
-                      onChange={(e) => setUploadSubjectId(e.target.value)}
-                      className="block w-full md:w-1/2 border border-slate-600 bg-slate-700 text-white rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
-                      required
-                    >
-                      <option value="">-- Choose a Subject --</option>
-                      {subjects.map((s) => (
-                        <option key={s._id} value={s._id}>{s.subjectName}</option>
-                      ))}
-                    </select>
+                    <label className="block text-sm font-medium text-gray-300 mb-2 transition-colors">Target</label>
+                    <div className="bg-slate-700 p-3 rounded-lg border border-slate-600 flex items-center justify-between text-sm transition-colors">
+                      <span className="text-gray-300">Subject: <span className="font-semibold text-white">{subjects.find(s => s._id === uploadSubjectId)?.subjectName}</span></span>
+                      <span className="text-gray-300">Chapter: <span className="font-semibold text-emerald-400">{uploadChapterName}</span></span>
+                    </div>
                   </div>
 
                   <div>
@@ -370,17 +392,28 @@ Answer: B. Carbon Dioxide`}
                   <h2 className="text-xl font-bold text-white transition-colors">Manage Questions</h2>
                   <p className="text-sm text-gray-400 mt-1 transition-colors">Select a subject to view, edit, or delete its MCQs.</p>
                 </div>
-                <select
-                  className="border border-slate-600 bg-slate-700 text-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none min-w-[220px] transition-colors"
-                  value={selectedSubjectId}
-                  onChange={(e) => setSelectedSubjectId(e.target.value)}
-                >
-                  <option value="">-- Select a Subject --</option>
-                  {subjects.map(s => <option key={s._id} value={s._id}>{s.subjectName}</option>)}
-                </select>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select
+                    className="border border-slate-600 bg-slate-700 text-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none min-w-[200px] transition-colors"
+                    value={selectedSubjectId}
+                    onChange={(e) => { setSelectedSubjectId(e.target.value); setSelectedChapterId(''); }}
+                  >
+                    <option value="">-- Select a Subject --</option>
+                    {subjects.map(s => <option key={s._id} value={s._id}>{s.subjectName}</option>)}
+                  </select>
+                  <select
+                    className="border border-slate-600 bg-slate-700 text-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none min-w-[200px] transition-colors disabled:opacity-50"
+                    value={selectedChapterId}
+                    onChange={(e) => setSelectedChapterId(e.target.value)}
+                    disabled={!selectedSubjectId || manageChaptersDropdown.length === 0}
+                  >
+                    <option value="">-- Select a Chapter --</option>
+                    {manageChaptersDropdown.map(c => <option key={c._id} value={c._id}>{c.chapterName}</option>)}
+                  </select>
+                </div>
               </div>
 
-              {loading ? <Loader2 className="h-8 w-8 text-emerald-600 animate-spin mx-auto my-10" /> : selectedSubjectId ? (
+              {loading ? <Loader2 className="h-8 w-8 text-emerald-600 animate-spin mx-auto my-10" /> : selectedSubjectId && selectedChapterId ? (
                 <div className="space-y-4">
                   {mcqs.length === 0 ? (
                     <p className="text-center text-gray-400 py-10">No questions found for this subject. Use the <strong>Upload MCQs</strong> tab to add some.</p>
@@ -407,7 +440,7 @@ Answer: B. Carbon Dioxide`}
               ) : (
                 <div className="text-center py-20 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 transition-colors">
                   <FileQuestion className="h-12 w-12 text-gray-600 mx-auto mb-3 transition-colors" />
-                  <p className="text-gray-400 transition-colors">Select a subject from the dropdown to view its questions.</p>
+                  <p className="text-gray-400 transition-colors">Select a subject and a chapter from the dropdowns above to view questions.</p>
                 </div>
               )}
             </>
@@ -533,6 +566,15 @@ Answer: B. Carbon Dioxide`}
               </form>
             </div>
           </div>
+        )}
+        {/* Chapters Modal */}
+        {isChaptersModalOpen && activeSubjectForChapters && (
+          <ChaptersModal 
+            subjectId={activeSubjectForChapters._id} 
+            subjectName={activeSubjectForChapters.subjectName} 
+            onClose={() => setIsChaptersModalOpen(false)} 
+            onUploadMCQs={(chapter) => goToUploadForChapter(activeSubjectForChapters._id, chapter._id, chapter.chapterName)} 
+          />
         )}
       </div>
     </div>

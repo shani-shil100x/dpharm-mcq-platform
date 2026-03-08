@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
-import { Loader2, Clock, CheckCircle2, XCircle, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Loader2, Clock, CheckCircle2, XCircle, ChevronRight, AlertTriangle, ListTree, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 
 // OPTIMIZATION: Memoized QuestionCard prevents all 50 questions from re-rendering
 // every time the user selects an answer for just one of them.
@@ -48,8 +47,11 @@ export default function ExamPage() {
   const params = useParams();
   const subjectId = params.subjectId;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const chapterId = searchParams.get('chapterId');
   const { user, loading: authLoading } = useAuth();
 
+  const [chapters, setChapters] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [subject, setSubject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -79,15 +81,20 @@ export default function ExamPage() {
         const currentSub = subRes.data.find(s => s._id === subjectId);
         setSubject(currentSub);
 
-        const { data } = await api.get(`/questions?subjectId=${subjectId}&limit=50`);
-        setQuestions(data.questions);
+        if (!chapterId && subjectId) {
+          const { data } = await api.get(`/chapters?subjectId=${subjectId}`);
+          setChapters(data);
+        } else if (chapterId && subjectId) {
+          const { data } = await api.get(`/questions?subjectId=${subjectId}&chapterId=${chapterId}&limit=50`);
+          setQuestions(data.questions);
+        }
       } catch (error) {
       } finally {
         setLoading(false);
       }
     };
     if (subjectId && user) fetchExamData();
-  }, [subjectId, user]);
+  }, [subjectId, chapterId, user]);
 
   useEffect(() => {
     if (isExamStarted && timeLeft > 0 && !examFinished) {
@@ -104,13 +111,13 @@ export default function ExamPage() {
     setIsExamStarted(true);
   };
 
-  const handleOptionSelect = (qId, option) => {
+  const handleOptionSelect = useCallback((qId, option) => {
     if (examFinished) return;
     setSelectedAnswers(prev => ({
       ...prev,
       [qId]: option
     }));
-  };
+  }, [examFinished]);
 
   const submitExam = async (isAuto = false) => {
     if (examFinished || isSubmitting) return;
@@ -131,6 +138,7 @@ export default function ExamPage() {
       // Send answers to server for server-side scoring
       const { data } = await api.post('/exam/submit', {
         subjectId,
+        chapterId,
         answers: selectedAnswers,
       });
       setResultData(data);
@@ -178,13 +186,56 @@ export default function ExamPage() {
     );
   }
 
-  if (loading) {
+  if (loading && questions.length === 0 && chapters.length === 0) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />
       </div>
     );
   }
+
+  // --- CHAPTER SELECTION SCREEN ---
+  if (!chapterId && subject) {
+    return (
+      <div className="max-w-4xl mx-auto pb-20 px-4">
+        <div className="mb-8 flex items-center justify-between">
+          <Link href="/" className="text-gray-400 hover:text-gray-100 transition-colors flex items-center text-sm font-medium">
+            <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to Subjects
+          </Link>
+        </div>
+        
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-white mb-3">Select a <span className="text-emerald-400">Chapter</span> for Exam</h1>
+          <p className="text-gray-400">Choose a chapter to begin your mock exam.</p>
+        </div>
+
+        {chapters.length === 0 ? (
+          <div className="text-center py-20 bg-slate-800 rounded-xl border border-slate-700">
+            <ListTree className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-300">No chapters found.</h2>
+            <p className="text-gray-500 mt-2">This subject doesn't have any chapters yet.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {chapters.map((chapter) => (
+              <Link 
+                key={chapter._id} 
+                href={`/exam/${subjectId}?chapterId=${chapter._id}`}
+                className="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 transition-all duration-300 flex justify-between items-center group"
+              >
+                <div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">{chapter.chapterName}</h3>
+                  <p className="text-sm text-gray-400 mt-1">{chapter.totalQuestions} Questions</p>
+                </div>
+                <ChevronRight className="text-gray-500 group-hover:text-emerald-400 transition-colors" />
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  // --------------------------------
 
   if (questions.length === 0) {
     return (
@@ -237,8 +288,8 @@ export default function ExamPage() {
             </div>
 
             <div className="flex justify-center gap-4 mt-8">
-              <Link href={`/practice/${subjectId}`} className="px-6 py-3 font-semibold text-gray-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors">
-                Review Questions
+              <Link href={`/exam/${subjectId}`} className="px-6 py-3 font-semibold text-gray-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors">
+                Other Chapters
               </Link>
               <Link href="/dashboard" className="px-6 py-3 font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-md transition-colors">
                 Go to Dashboard

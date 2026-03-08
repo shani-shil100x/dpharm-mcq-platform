@@ -6,7 +6,7 @@ const Subject = require('../models/Subject');
 // @access  Public
 const getQuestions = async (req, res, next) => {
   try {
-    const { subjectId, page = 1, limit = 10 } = req.query;
+    const { subjectId, chapterId, page = 1, limit = 10 } = req.query;
 
     if (!subjectId) {
       res.status(400);
@@ -16,15 +16,21 @@ const getQuestions = async (req, res, next) => {
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
 
+    // Build query dynamically based on whether chapter is provided
+    const matchQuery = { subjectId };
+    if (chapterId) {
+      matchQuery.chapterId = chapterId;
+    }
+
     // OPTIMIZATION: Use .lean() to return raw JSON instead of heavy Mongoose Documents.
     // OPTIMIZATION: Exclude __v, createdAt, updatedAt as frontend doesn't need them.
-    const questions = await Question.find({ subjectId })
+    const questions = await Question.find(matchQuery)
       .select('-__v -createdAt -updatedAt')
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum)
       .lean();
 
-    const total = await Question.countDocuments({ subjectId });
+    const total = await Question.countDocuments(matchQuery);
 
     res.json({
       questions,
@@ -42,17 +48,24 @@ const getQuestions = async (req, res, next) => {
 // @access  Private/Admin
 const bulkUploadQuestions = async (req, res, next) => {
   try {
-    const { subjectId, rawText } = req.body;
+    const { subjectId, chapterId, rawText } = req.body;
 
-    if (!subjectId || !rawText) {
+    if (!subjectId || !chapterId || !rawText) {
       res.status(400);
-      throw new Error('Please provide subjectId and rawText');
+      throw new Error('Please provide subjectId, chapterId, and rawText');
     }
 
     const subject = await Subject.findById(subjectId);
     if (!subject) {
       res.status(404);
       throw new Error('Subject not found');
+    }
+
+    const Chapter = require('../models/Chapter');
+    const chapter = await Chapter.findById(chapterId);
+    if (!chapter || chapter.subjectId.toString() !== subjectId) {
+      res.status(404);
+      throw new Error('Chapter not found in this subject');
     }
 
     // Split text by double new lines to get individual question blocks
@@ -82,6 +95,7 @@ const bulkUploadQuestions = async (req, res, next) => {
 
           questionsToInsert.push({
             subjectId,
+            chapterId,
             questionText,
             options,
             correctAnswer,

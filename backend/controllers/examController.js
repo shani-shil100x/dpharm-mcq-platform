@@ -7,7 +7,7 @@ const Question = require('../models/Question');
 // @access  Private
 const submitExam = async (req, res, next) => {
   try {
-    const { subjectId, answers } = req.body;
+    const { subjectId, chapterId, answers } = req.body;
     // answers = { questionId: selectedOption, ... }
 
     if (!subjectId) {
@@ -15,10 +15,15 @@ const submitExam = async (req, res, next) => {
       throw new Error('subjectId is required');
     }
 
-    // Fetch all questions for this subject to score server-side
+    const matchQuery = { subjectId };
+    if (chapterId) {
+      matchQuery.chapterId = chapterId;
+    }
+
+    // Fetch questions for this subject/chapter to score server-side
     // OPTIMIZATION: Only request _id and correctAnswer, and use .lean() for raw JSON.
     // This dramatically reduces memory when fetching 50+ questions at once.
-    const questions = await Question.find({ subjectId })
+    const questions = await Question.find(matchQuery)
       .select('_id correctAnswer')
       .lean();
 

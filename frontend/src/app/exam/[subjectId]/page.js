@@ -12,13 +12,13 @@ import Link from 'next/link';
 const QuestionCard = React.memo(({ q, index, selectedOption, onSelect }) => {
   return (
     <div id={`q-${index}`} className="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
-      <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex items-center justify-between">
-        <h3 className="text-lg font-bold text-white font-serif leading-relaxed">
+      <div className="p-4 sm:p-6 border-b border-slate-700/50 bg-slate-800 flex items-center justify-between gap-2">
+        <h3 className="text-base sm:text-lg font-bold text-white font-serif leading-relaxed">
           <span className="text-emerald-400 mr-2">Q{index + 1}.</span>
           {q.questionText}
         </h3>
       </div>
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="space-y-3">
           {q.options.map((option, idx) => {
             const isSelected = selectedOption === option;
@@ -26,7 +26,7 @@ const QuestionCard = React.memo(({ q, index, selectedOption, onSelect }) => {
               <button
                 key={idx}
                 onClick={() => onSelect(q._id, option)}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 font-medium text-sm mcq-option
+                className={`w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 font-medium text-sm mcq-option
                   ${isSelected ? 'bg-emerald-900/30 border-emerald-600 text-emerald-300 shadow-sm' : 'bg-slate-800 border-slate-700 hover:border-emerald-500 hover:bg-slate-700/50 text-gray-300'}
                 `}
               >
@@ -205,7 +205,7 @@ export default function ExamPage() {
         </div>
         
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-white mb-3">Select a <span className="text-emerald-400">Chapter</span> for Exam</h1>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white mb-3">Select a <span className="text-emerald-400">Chapter</span> for Exam</h1>
           <p className="text-gray-400">Choose a chapter to begin your mock exam.</p>
         </div>
 
@@ -250,15 +250,15 @@ export default function ExamPage() {
 
   if (examFinished && resultData) {
     return (
-      <div className="max-w-2xl mx-auto py-10">
+      <div className="max-w-2xl mx-auto py-10 px-4">
         <div className="bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-700 transition-colors duration-300">
           <div className="bg-emerald-700 p-8 text-center transition-colors">
-             <h2 className="text-3xl font-bold text-white mb-2">Exam Completed!</h2>
+             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Exam Completed!</h2>
              <p className="text-emerald-100">{subject?.subjectName} - Final Result</p>
           </div>
           
           <div className="p-8">
-            <div className="grid grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-8">
               <div className="bg-slate-700/50 border border-slate-600 rounded-xl p-4 text-center transition-colors">
                 <p className="text-sm font-medium text-gray-400 mb-1">Total Questions</p>
                 <p className="text-2xl font-bold text-white">{resultData.totalQuestions}</p>
@@ -288,10 +288,10 @@ export default function ExamPage() {
             </div>
 
             <div className="flex justify-center gap-4 mt-8">
-              <Link href={`/exam/${subjectId}`} className="px-6 py-3 font-semibold text-gray-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors">
+              <Link href={`/exam/${subjectId}`} className="px-4 sm:px-6 py-3 font-semibold text-gray-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors text-sm sm:text-base text-center">
                 Other Chapters
               </Link>
-              <Link href="/dashboard" className="px-6 py-3 font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-md transition-colors">
+              <Link href="/dashboard" className="px-4 sm:px-6 py-3 font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-md transition-colors text-sm sm:text-base text-center">
                 Go to Dashboard
               </Link>
             </div>
@@ -303,12 +303,12 @@ export default function ExamPage() {
 
   if (!isExamStarted) {
     return (
-      <div className="max-w-xl mx-auto py-20 text-center">
-        <div className="bg-slate-800 p-10 rounded-3xl shadow-lg border border-slate-700 transition-colors duration-300">
+      <div className="max-w-xl mx-auto py-10 sm:py-20 text-center px-4">
+        <div className="bg-slate-800 p-6 sm:p-10 rounded-3xl shadow-lg border border-slate-700 transition-colors duration-300">
           <div className="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
              <Clock className="w-10 h-10 text-emerald-400" />
           </div>
-          <h1 className="text-3xl font-extrabold text-white mb-4">{subject?.subjectName} Mock Exam</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">{subject?.subjectName} Mock Exam</h1>
           
           <ul className="text-left space-y-4 mb-10 text-gray-300 max-w-sm mx-auto">
             <li className="flex items-center"><CheckCircle2 className="w-5 h-5 mr-3 text-emerald-400" /> <span className="text-gray-300">Total Questions:</span> <strong className="ml-1 text-white">{questions.length}</strong></li>
@@ -328,9 +328,9 @@ export default function ExamPage() {
   // Active Exam View
   const isWarning = timeLeft <= 300; // 5 mins
   return (
-    <div className="max-w-4xl mx-auto pb-24 relative">
-      <div className={`sticky top-16 z-40 p-4 border-b shadow-sm rounded-b-2xl mb-8 flex items-center justify-between transition-colors duration-300 ${isWarning ? 'bg-red-900/30 text-red-400 border-red-800' : 'bg-slate-800 text-gray-200 border-slate-700'}`}>
-        <div className="font-bold text-lg flex items-center text-white">
+    <div className="max-w-4xl mx-auto pb-24 relative px-4">
+      <div className={`sticky top-16 z-40 p-3 sm:p-4 border-b shadow-sm rounded-b-2xl mb-6 sm:mb-8 flex items-center justify-between gap-2 transition-colors duration-300 ${isWarning ? 'bg-red-900/30 text-red-400 border-red-800' : 'bg-slate-800 text-gray-200 border-slate-700'}`}>
+        <div className="font-bold text-sm sm:text-lg flex items-center text-white shrink-0">
           <Clock className={`w-5 h-5 mr-2 text-emerald-400 ${isWarning ? 'animate-pulse text-red-400' : ''}`} />
           {formatTime(timeLeft)}
         </div>
@@ -340,7 +340,7 @@ export default function ExamPage() {
         <button 
           onClick={() => submitExam()} 
           disabled={isSubmitting}
-          className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md transition-all flex items-center disabled:opacity-50"
+          className="bg-gray-900 hover:bg-gray-800 text-white px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-bold shadow-md transition-all flex items-center disabled:opacity-50 shrink-0"
         >
           {isSubmitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
           Submit Exam

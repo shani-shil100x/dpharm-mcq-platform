@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/axios';
-import { Loader2, Trophy, Clock, ArrowRight, TrendingUp, ChevronLeft, CheckCircle, XCircle, Target, Trash2 } from 'lucide-react';
+import { Loader2, Trophy, Clock, ArrowRight, TrendingUp, CheckCircle, XCircle, Target, Trash2 } from 'lucide-react';
 
 export default function ProgressPage() {
   const { user, loading } = useAuth();

@@ -13,9 +13,18 @@ const app = express();
 
 // Ensure DB is connected before handling any requests in serverless environment
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('DB Connection Middleware Error:', error.message);
+    res.status(503).json({
+      message: 'Service temporarily unavailable. Database connection failed.',
+      error: process.env.NODE_ENV === 'production' ? undefined : error.message,
+    });
+  }
 });
+
 
 // Security headers
 app.use(helmet());

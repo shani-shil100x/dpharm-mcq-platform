@@ -294,16 +294,30 @@ export default function AdminDashboard() {
                           <td className="px-6 py-4 text-sm font-medium text-gray-200">{s.subjectName}</td>
                           <td className="px-6 py-4 text-sm text-gray-400">{s.subjectIcon}</td>
                           <td className="px-6 py-4 text-sm text-gray-400">{s.totalQuestions}</td>
-                          <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
-                            <button 
-                              onClick={() => { setActiveSubjectForChapters(s); setIsChaptersModalOpen(true); }} 
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-purple-900/40 text-purple-400 rounded-lg hover:bg-purple-900/60 transition-colors" 
-                              title="Manage Chapters"
-                            >
-                              <ListTree className="h-3.5 w-3.5" /> Chapters
-                            </button>
-                            <button onClick={() => handleOpenSubjectModal(s)} className="text-blue-400 hover:text-blue-300" title="Edit subject"><Edit2 className="h-4 w-4 inline" /></button>
-                            <button onClick={() => handleDeleteSubject(s._id)} className="text-red-400 hover:text-red-300" title="Delete subject"><Trash2 className="h-4 w-4 inline" /></button>
+                          <td className="px-6 py-4 text-sm font-medium">
+                            <div className="flex flex-wrap items-center justify-end gap-2 min-w-[120px]">
+                              <button 
+                                onClick={() => { setActiveSubjectForChapters(s); setIsChaptersModalOpen(true); }} 
+                                className="inline-flex shrink-0 items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium bg-purple-900/40 text-purple-400 rounded-lg hover:bg-purple-900/60 transition-colors" 
+                                title="Manage Chapters"
+                              >
+                                <ListTree className="h-4 w-4" /> <span className="hidden sm:inline">Chapters</span>
+                              </button>
+                              <button 
+                                onClick={() => handleOpenSubjectModal(s)} 
+                                className="p-2 shrink-0 bg-blue-900/20 text-blue-400 hover:bg-blue-900/40 rounded-lg transition-colors" 
+                                title="Edit subject"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteSubject(s._id)} 
+                                className="p-2 shrink-0 bg-red-900/20 text-red-400 hover:bg-red-900/40 rounded-lg transition-colors" 
+                                title="Delete subject"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

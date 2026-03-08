@@ -4,13 +4,13 @@ let isConnected = false;
 
 const connectDB = async () => {
   if (isConnected) {
-    console.log('Using existing MongoDB connection');
     return;
   }
 
   if (!process.env.MONGODB_URI) {
-    console.error('CRITICAL ERROR: MONGODB_URI environment variable is not defined.');
-    return; // Don't crash, let the API routes return errors gracefully
+    throw new Error(
+      'MONGODB_URI environment variable is not set. Please add it in your Vercel project settings under Settings > Environment Variables.'
+    );
   }
 
   try {
@@ -19,7 +19,8 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${db.connection.host}`);
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
-    // DO NOT process.exit(1) in a serverless environment as it crashes the invocation
+    // Throw so the request handler returns a proper error response
+    throw new Error(`Database connection failed: ${error.message}`);
   }
 };
 

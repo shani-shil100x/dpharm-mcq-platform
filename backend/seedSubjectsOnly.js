@@ -9,7 +9,7 @@ dotenv.config();
 
 const run = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/dpharm-mcq');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dpharm-mcq');
     console.log('MongoDB Connected');
 
     // Only clear subjects and questions, leave users

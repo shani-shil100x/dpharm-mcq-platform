@@ -42,12 +42,12 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="text-center mb-16">
-        <h1 className="text-5xl font-extrabold text-white mb-4 tracking-tight">
+    <div className="container mx-auto px-4 py-8 sm:py-12">
+      <div className="text-center mb-10 sm:mb-16">
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-3 sm:mb-4 tracking-tight">
           Master Your <span className="text-emerald-400">D.Pharm</span> Subjects
         </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+        <p className="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto px-2">
           Practice subject-wise multiple choice questions, take timed mock tests, and track your performance to ace your 1st-year exams.
         </p>
       </div>
@@ -57,7 +57,7 @@ export default function HomePage() {
           <Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 max-w-6xl mx-auto">
           {subjects.map((subject, index) => (
             <motion.div
               key={subject._id}
@@ -74,7 +74,7 @@ export default function HomePage() {
                   <div className="p-3 bg-emerald-900/30 text-emerald-400 rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
                     <SubjectIcon name={subject.subjectIcon} className="h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-white">{subject.subjectName}</h3>
+                  <h3 className="text-base sm:text-xl font-bold text-white leading-tight">{subject.subjectName}</h3>
                 </div>
                 
                 <div className="flex items-center text-sm text-gray-400 mb-6 relative z-10">

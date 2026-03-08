@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, User, LayoutDashboard, BrainCircuit, Upload, Menu, X, Home, TrendingUp, Youtube } from 'lucide-react';
+import { LogOut, User, LayoutDashboard, BrainCircuit, Menu, X, Home, TrendingUp, Youtube } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout, loading } = useAuth();

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, UploadCloud, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Loader2 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
   const { user, loading } = useAuth();

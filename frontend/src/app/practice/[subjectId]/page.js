@@ -46,8 +46,8 @@ const PracticeQuestionCard = memo(({ q, globalIndex, selectedOption, onSelect })
 
   return (
     <div id={`q-${globalIndex}`} className="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
-      <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex justify-between items-start">
-        <h3 className="text-lg font-bold text-white font-serif leading-relaxed">
+      <div className="p-4 sm:p-6 border-b border-slate-700/50 bg-slate-800 flex justify-between items-start gap-2">
+        <h3 className="text-base sm:text-lg font-bold text-white font-serif leading-relaxed">
           <span className="text-emerald-400 mr-2">Q{globalIndex}.</span>
           {q.questionText}
         </h3>
@@ -61,14 +61,14 @@ const PracticeQuestionCard = memo(({ q, globalIndex, selectedOption, onSelect })
           </div>
         )}
       </div>
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="space-y-3">
           {q.options.map((option, idx) => (
             <button
               key={idx}
               onClick={() => onSelect(q._id, option, q.correctAnswer)}
               disabled={isAnswered}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-300 mcq-option font-medium text-sm ${getOptionStyles(option)}`}
+              className={`w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 mcq-option font-medium text-sm ${getOptionStyles(option)}`}
             >
               <span className="inline-block w-6 font-bold opacity-70">
                 {String.fromCharCode(65 + idx)}.
@@ -197,7 +197,7 @@ export default function PracticePage() {
         </div>
         
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-white mb-3">Select a <span className="text-emerald-400">Chapter</span></h1>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white mb-3">Select a <span className="text-emerald-400">Chapter</span></h1>
           <p className="text-gray-400">Choose a chapter to begin your practice session.</p>
         </div>
 
@@ -244,7 +244,7 @@ export default function PracticePage() {
   const totalAnswered = Object.keys(selectedAnswers).length;
 
   return (
-    <div className="max-w-3xl mx-auto pb-20">
+    <div className="max-w-3xl mx-auto pb-20 px-4">
       <div className="mb-8 flex items-center justify-between">
         <Link href={`/practice/${subjectId}`} className="text-gray-400 hover:text-gray-100 transition-colors flex items-center text-sm font-medium">
           <ArrowLeft className="h-4 w-4 mr-1.5" /> Chapters
@@ -256,21 +256,21 @@ export default function PracticePage() {
 
       {/* Live Score Bar */}
       {totalAnswered > 0 && (
-        <div className="mb-6 bg-slate-800 rounded-xl border border-slate-700 shadow-sm p-4 flex items-center justify-between transition-colors duration-300">
-          <div className="flex items-center gap-4">
-            <BarChart3 className="h-5 w-5 text-gray-500" />
+        <div className="mb-6 bg-slate-800 rounded-xl border border-slate-700 shadow-sm p-3 sm:p-4 transition-colors duration-300">
+          <div className="flex items-center gap-2 mb-3 sm:mb-0 sm:gap-4">
+            <BarChart3 className="h-5 w-5 text-gray-500 shrink-0" />
             <span className="text-sm font-medium text-gray-300">Score:</span>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-1.5">
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:justify-end sm:gap-6 mt-2">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              <span className="text-sm font-bold text-emerald-400">{correctCount} Correct</span>
+              <span className="text-xs sm:text-sm font-bold text-emerald-400">{correctCount} Correct</span>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <XCircle className="h-4 w-4 text-red-400" />
-              <span className="text-sm font-bold text-red-400">{wrongCount} Wrong</span>
+              <span className="text-xs sm:text-sm font-bold text-red-400">{wrongCount} Wrong</span>
             </div>
-            <div className="text-sm font-bold text-white">
+            <div className="text-xs sm:text-sm font-bold text-white text-center">
               {totalAnswered > 0 ? ((correctCount / totalAnswered) * 100).toFixed(0) : 0}% Accuracy
             </div>
           </div>

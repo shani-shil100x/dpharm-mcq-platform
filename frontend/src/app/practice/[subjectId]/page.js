@@ -115,6 +115,10 @@ export default function PracticePage() {
       try {
         if (!chapterId && subjectId) {
           // Fetch chapters for chapter selection screen
+          setQuestions([]);
+          setSelectedAnswers({});
+          setCorrectCount(0);
+          setWrongCount(0);
           const { data } = await api.get(`/chapters?subjectId=${subjectId}`);
           setChapters(data);
         } else if (chapterId && subjectId) {
@@ -133,25 +137,27 @@ export default function PracticePage() {
   }, [subjectId, chapterId, page, user]);
 
   const handleOptionSelect = useCallback((qId, option, correctAnswer) => {
-    if (selectedAnswers[qId]) return; // Disable if already answered
+    setSelectedAnswers((prev) => {
+      if (prev[qId]) return prev; // Disable if already answered
 
-    setSelectedAnswers((prev) => ({
-      ...prev,
-      [qId]: option,
-    }));
+      // Calculate correctness ONLY if not previously answered
+      const normalize = (str) => (str || '').toString().trim().toLowerCase();
+      const optBody = normalize(option.replace(/^[A-Z]\.\s*/i, ''));
+      const ansBody = normalize((correctAnswer || '').replace(/^[A-Z]\.\s*/i, ''));
+      const isCorrect = normalize(option) === normalize(correctAnswer) || optBody === ansBody;
 
-    // Use robust checking here as well for overall score logic
-    const normalize = (str) => (str || '').toString().trim().toLowerCase();
-    const optBody = normalize(option.replace(/^[A-Z]\.\s*/i, ''));
-    const ansBody = normalize((correctAnswer || '').replace(/^[A-Z]\.\s*/i, ''));
-    const isCorrect = normalize(option) === normalize(correctAnswer) || optBody === ansBody;
+      if (isCorrect) {
+        setCorrectCount(c => c + 1);
+      } else {
+        setWrongCount(c => c + 1);
+      }
 
-    if (isCorrect) {
-      setCorrectCount(c => c + 1);
-    } else {
-      setWrongCount(c => c + 1);
-    }
-  }, [selectedAnswers]);
+      return {
+        ...prev,
+        [qId]: option,
+      };
+    });
+  }, []);
 
   // Save practice stats when user clicks "Save Progress"
   // Fixed a massive bug where this was in a useEffect cleanup, causing an API call on EVERY single click!
@@ -178,7 +184,7 @@ export default function PracticePage() {
     );
   }
 
-  if (loading && questions.length === 0 && chapters.length === 0) {
+  if (loading && (chapters.length === 0 || questions.length === 0)) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />

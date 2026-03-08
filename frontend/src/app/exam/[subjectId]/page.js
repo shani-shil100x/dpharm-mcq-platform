@@ -82,6 +82,11 @@ export default function ExamPage() {
         setSubject(currentSub);
 
         if (!chapterId && subjectId) {
+          setQuestions([]);
+          setSelectedAnswers({});
+          setIsExamStarted(false);
+          setExamFinished(false);
+          setResultData(null);
           const { data } = await api.get(`/chapters?subjectId=${subjectId}`);
           setChapters(data);
         } else if (chapterId && subjectId) {
@@ -186,7 +191,7 @@ export default function ExamPage() {
     );
   }
 
-  if (loading && questions.length === 0 && chapters.length === 0) {
+  if (loading && (chapters.length === 0 || questions.length === 0)) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />

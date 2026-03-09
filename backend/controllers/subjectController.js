@@ -21,13 +21,21 @@ const getSubjects = async (req, res, next) => {
         },
       },
       {
+        $lookup: {
+          from: 'chapters',          // The collection name in MongoDB for Chapter model
+          localField: '_id',
+          foreignField: 'subjectId',
+          as: 'chaptersList',
+        },
+      },
+      {
         $project: {
           _id: 1,
           subjectName: 1,
-          subjectIcon: 1,
           createdAt: 1,
           updatedAt: 1,
           totalQuestions: { $size: '$questionsList' }, // Instantly get the count
+          totalChapters: { $size: '$chaptersList' },   // Instantly get chapter count
         },
       },
       {
@@ -56,7 +64,6 @@ const createSubject = async (req, res, next) => {
 
     const subject = new Subject({
       subjectName,
-      subjectIcon,
     });
 
     const createdSubject = await subject.save();
@@ -77,7 +84,6 @@ const updateSubject = async (req, res, next) => {
 
     if (subject) {
       if (subjectName) subject.subjectName = subjectName;
-      if (subjectIcon) subject.subjectIcon = subjectIcon;
 
       const updatedSubject = await subject.save();
       res.json(updatedSubject);

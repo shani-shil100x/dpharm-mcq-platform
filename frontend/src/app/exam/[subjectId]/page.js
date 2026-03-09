@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
-import { Loader2, Clock, CheckCircle2, XCircle, ChevronRight, AlertTriangle, ListTree, ArrowLeft } from 'lucide-react';
+import { Loader2, Clock, CheckCircle2, ChevronRight, AlertTriangle, ListTree, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 // OPTIMIZATION: Memoized QuestionCard prevents all 50 questions from re-rendering
@@ -90,7 +90,7 @@ export default function ExamPage() {
           const { data } = await api.get(`/chapters?subjectId=${subjectId}`);
           setChapters(data);
         } else if (chapterId && subjectId) {
-          const { data } = await api.get(`/questions?subjectId=${subjectId}&chapterId=${chapterId}&limit=50`);
+          const { data } = await api.get(`/questions?subjectId=${subjectId}&chapterId=${chapterId}&limit=1000`);
           setQuestions(data.questions);
         }
       } catch (error) {

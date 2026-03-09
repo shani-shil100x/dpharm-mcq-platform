@@ -51,7 +51,6 @@ export default function AdminDashboard() {
   // Subject Form
   const [subjectId, setSubjectId] = useState(null);
   const [subjectName, setSubjectName] = useState('');
-  const [subjectIcon, setSubjectIcon] = useState('Book');
 
   // MCQ Edit Form
   const [mcqId, setMcqId] = useState(null);
@@ -121,11 +120,9 @@ export default function AdminDashboard() {
     if (subject) {
       setSubjectId(subject._id);
       setSubjectName(subject.subjectName);
-      setSubjectIcon(subject.subjectIcon);
     } else {
       setSubjectId(null);
       setSubjectName('');
-      setSubjectIcon('Book');
     }
     setIsModalOpen(true);
   };
@@ -135,9 +132,9 @@ export default function AdminDashboard() {
     setIsSubmitting(true);
     try {
       if (subjectId) {
-        await api.put(`/subjects/${subjectId}`, { subjectName, subjectIcon });
+        await api.put(`/subjects/${subjectId}`, { subjectName });
       } else {
-        await api.post('/subjects', { subjectName, subjectIcon });
+        await api.post('/subjects', { subjectName });
       }
       setIsModalOpen(false);
       fetchData();
@@ -250,7 +247,7 @@ export default function AdminDashboard() {
 
       <div className="bg-slate-800 rounded-xl shadow-sm border border-slate-700 overflow-hidden transition-colors duration-300">
         {/* Tabs */}
-        <div className="flex overflow-x-auto border-b border-slate-700 transition-colors">
+        <div className="flex overflow-x-auto border-b border-slate-700 transition-colors hide-scrollbar">
           {tabs.filter(tab => tab.key !== 'upload' || (activeTab === 'upload')).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -282,17 +279,17 @@ export default function AdminDashboard() {
                   <table className="min-w-full divide-y divide-slate-700 transition-colors">
                     <thead className="bg-slate-700/50 transition-colors">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Subject Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Icon</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Total Qs</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">Actions</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Subject Name</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Total Chapters</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Total Qs</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-700 transition-colors">
                       {subjects.map((s) => (
                         <tr key={s._id} className="hover:bg-slate-700/50 transition-colors">
                           <td className="px-6 py-4 text-sm font-medium text-gray-200">{s.subjectName}</td>
-                          <td className="px-6 py-4 text-sm text-gray-400">{s.subjectIcon}</td>
+                          <td className="px-6 py-4 text-sm text-gray-400">{s.totalChapters || 0}</td>
                           <td className="px-6 py-4 text-sm text-gray-400">{s.totalQuestions}</td>
                           <td className="px-6 py-4 text-sm font-medium">
                             <div className="flex flex-wrap items-center justify-end gap-2 min-w-[120px]">
@@ -406,9 +403,9 @@ Answer: B. Carbon Dioxide`}
                   <h2 className="text-xl font-bold text-white transition-colors">Manage Questions</h2>
                   <p className="text-sm text-gray-400 mt-1 transition-colors">Select a subject to view, edit, or delete its MCQs.</p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col w-full sm:w-auto sm:flex-row gap-3">
                   <select
-                    className="border border-slate-600 bg-slate-700 text-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none min-w-[200px] transition-colors"
+                    className="border border-slate-600 bg-slate-700 text-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none w-full sm:min-w-[200px] text-ellipsis overflow-hidden break-words transition-colors"
                     value={selectedSubjectId}
                     onChange={(e) => { setSelectedSubjectId(e.target.value); setSelectedChapterId(''); }}
                   >
@@ -416,7 +413,7 @@ Answer: B. Carbon Dioxide`}
                     {subjects.map(s => <option key={s._id} value={s._id}>{s.subjectName}</option>)}
                   </select>
                   <select
-                    className="border border-slate-600 bg-slate-700 text-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none min-w-[200px] transition-colors disabled:opacity-50"
+                    className="border border-slate-600 bg-slate-700 text-white rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none w-full sm:min-w-[200px] text-ellipsis overflow-hidden break-words transition-colors disabled:opacity-50"
                     value={selectedChapterId}
                     onChange={(e) => setSelectedChapterId(e.target.value)}
                     disabled={!selectedSubjectId || manageChaptersDropdown.length === 0}
@@ -532,11 +529,6 @@ Answer: B. Carbon Dioxide`}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Subject Name</label>
                   <input type="text" required value={subjectName} onChange={(e) => setSubjectName(e.target.value)} className="block w-full border border-slate-600 bg-slate-700 text-white rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Lucide Icon Name</label>
-                  <input type="text" required value={subjectIcon} onChange={(e) => setSubjectIcon(e.target.value)} className="block w-full border border-slate-600 bg-slate-700 text-white rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors" />
-                  <p className="text-xs text-gray-400 mt-1">e.g. Pill, TestTubes, Leaf, HeartPulse, Users</p>
                 </div>
                 <div className="flex justify-end gap-3 mt-6">
                   <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm text-gray-300 bg-slate-700 border border-slate-600 rounded-lg hover:bg-slate-600 transition-colors">Cancel</button>

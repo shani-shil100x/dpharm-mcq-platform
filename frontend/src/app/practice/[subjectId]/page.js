@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
@@ -101,6 +101,8 @@ export default function PracticePage() {
   const [selectedAnswers, setSelectedAnswers] = useState({}); // { questionId: selectedOptionContent }
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false); // Sync guard against double-clicks / StrictMode double-invoke
 
   // Auth guard
   useEffect(() => {
@@ -160,19 +162,25 @@ export default function PracticePage() {
   }, []);
 
   // Save practice stats when user clicks "Save Progress"
-  // Fixed a massive bug where this was in a useEffect cleanup, causing an API call on EVERY single click!
+  // Double-submit guard: isSubmittingRef (sync) + isSubmitting state (UI)
   const savePracticeStats = async () => {
     const attempted = Object.keys(selectedAnswers).length;
     if (attempted === 0 || !user) return;
+    if (isSubmittingRef.current) return; // Sync guard: blocks concurrent/double calls
 
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
     try {
       await api.post('/exam/submit', {
         subjectId,
         chapterId,
-        answers: selectedAnswers, // Backend expects 'answers', not generic counts
+        answers: selectedAnswers,
       });
     } catch (err) {
       console.error('Failed to save practice stats', err);
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
   };
 
@@ -329,10 +337,11 @@ export default function PracticePage() {
         <div className="mt-8 text-center">
           <button
             onClick={async () => { await savePracticeStats(); router.push('/dashboard'); }}
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all"
+            disabled={isSubmitting}
+            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <BarChart3 className="h-5 w-5" />
-            Save Progress & View Dashboard
+            {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <BarChart3 className="h-5 w-5" />}
+            {isSubmitting ? 'Saving...' : 'Save Progress & View Dashboard'}
           </button>
         </div>
       )}

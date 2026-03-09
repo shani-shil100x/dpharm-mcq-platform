@@ -65,6 +65,8 @@ export default function ExamPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const timerRef = useRef(null);
+  const isSubmittingRef = useRef(false);   // Sync lock: prevents race between timer auto-submit and manual submit
+  const examFinishedRef = useRef(false);   // Mirror of examFinished state, readable inside timer without stale closure
 
   // Auth guard
   useEffect(() => {
@@ -86,6 +88,8 @@ export default function ExamPage() {
           setSelectedAnswers({});
           setIsExamStarted(false);
           setExamFinished(false);
+          examFinishedRef.current = false;
+          isSubmittingRef.current = false;
           setResultData(null);
           const { data } = await api.get(`/chapters?subjectId=${subjectId}`);
           setChapters(data);
@@ -102,12 +106,14 @@ export default function ExamPage() {
   }, [subjectId, chapterId, user]);
 
   useEffect(() => {
-    if (isExamStarted && timeLeft > 0 && !examFinished) {
+    if (isExamStarted && timeLeft > 0 && !examFinishedRef.current) {
       timerRef.current = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
-    } else if (timeLeft === 0 && isExamStarted && !examFinished) {
-      handleAutoSubmit();
+    } else if (timeLeft === 0 && isExamStarted && !examFinishedRef.current) {
+      // Use ref to avoid stale closure — state value may lag in setTimeout callbacks
+      doSubmit(true);
     }
     return () => clearTimeout(timerRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, isExamStarted, examFinished]);
 
   const startExam = () => {
@@ -124,23 +130,27 @@ export default function ExamPage() {
     }));
   }, [examFinished]);
 
-  const submitExam = async (isAuto = false) => {
-    if (examFinished || isSubmitting) return;
+  // Synchronous submit guard — reads ref to avoid React re-render races
+  const doSubmit = async (isAuto = false) => {
+    if (examFinishedRef.current || isSubmittingRef.current) return;
 
     if (!isAuto) {
       const unanswered = questions.length - Object.keys(selectedAnswers).length;
       if (unanswered > 0) {
-        if (!confirm(`You have ${unanswered} unanswered questions. submitting anyway?`)) {
+        if (!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) {
           return;
         }
       }
     }
 
+    // Lock immediately — both ref (sync) and state (UI)
+    isSubmittingRef.current = true;
+    examFinishedRef.current = true;
     setIsSubmitting(true);
     setExamFinished(true);
+    clearTimeout(timerRef.current); // Stop the timer right away
 
     try {
-      // Send answers to server for server-side scoring
       const { data } = await api.post('/exam/submit', {
         subjectId,
         chapterId,
@@ -148,12 +158,12 @@ export default function ExamPage() {
       });
       setResultData(data);
     } catch (error) {
-      alert('Failed to save your exam results. But you can still view them.');
-      
-      // Local fallback if saving fails
+      alert('Failed to save your exam results. Your local score is shown below.');
+
+      // Local fallback scoring
       let correct = 0;
       let wrong = 0;
-      let attempted = Object.keys(selectedAnswers).length;
+      const attempted = Object.keys(selectedAnswers).length;
       questions.forEach((q) => {
         const ans = selectedAnswers[q._id];
         if (ans) {
@@ -166,16 +176,16 @@ export default function ExamPage() {
         attempted,
         correct,
         wrong,
-        accuracy: questions.length > 0 ? (correct / questions.length) * 100 : 0
+        accuracy: questions.length > 0 ? (correct / questions.length) * 100 : 0,
       });
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   };
 
-  const handleAutoSubmit = () => {
-    submitExam(true);
-  };
+  // Alias for button onClick calls
+  const submitExam = (isAuto = false) => doSubmit(isAuto);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
